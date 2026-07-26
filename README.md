@@ -4,7 +4,7 @@ Free control software for the Yamaha Motif Rack ES, running directly in the brow
 
 ## Start
 
-Open the HTML file in Chrome and allow MIDI access, then connect the Motif Rack ES via USB.
+Open the current version [`beyhl_synth_V9.html`](beyhl_synth_V9.html) in Chrome and allow MIDI access, then connect the Motif Rack ES via USB. Version 9 sends the official Yamaha SysEx mode-change command when switching between VOICE and MULTI and synchronizes the selected mode again when the MIDI output is connected.
 
 ## Notice
 
