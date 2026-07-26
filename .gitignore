@@ -1,0 +1,15 @@
+# Local credentials and agent state
+.env
+.env.*
+*.key
+*.pem
+*.p12
+*.pfx
+github_token.txt
+.git-credentials
+.codex*
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.DS_Store

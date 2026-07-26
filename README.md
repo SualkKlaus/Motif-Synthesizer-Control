@@ -4,7 +4,9 @@ Free control software for the Yamaha Motif Rack ES, running directly in the brow
 
 ## Start
 
-Open the current version [`beyhl_synth_V9.html`](beyhl_synth_V9.html) in Chrome and allow MIDI access, then connect the Motif Rack ES via USB. Version 9 sends the official Yamaha SysEx mode-change command when switching between VOICE and MULTI and synchronizes the selected mode again when the MIDI output is connected.
+Open the current version [`beyhl_synth_V10.html`](beyhl_synth_V10.html) in Chrome and allow MIDI access, then connect the Motif Rack ES via USB.
+
+Version 10 uses the Yamaha-documented Multi Part parameter-change addresses to assign a separate bank, voice, receive channel, volume, pan, and reverb level to each of the 16 parts. Mute turns the selected part's receive channel off; Solo temporarily turns all other parts' receive channels off. Instrument search works across all included banks and assigns the result only to the currently selected part.
 
 ## Notice
 
