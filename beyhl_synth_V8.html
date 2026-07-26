@@ -1,0 +1,1218 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Beyhl Synth V8 &middot; Motif Rack ES</title>
+<style>
+:root{
+  --bg:#0b1016; --panel:#141b24; --panel2:#1a2230; --panel3:#212b3a; --line:#25303f;
+  --fg:#e9eff6; --mid:#93a2b4; --dim:#5d6b7c;
+  --part:#3d9bf5; --filter:#2dd4a7; --env:#8b7bf7; --mix:#f2a33c; --elem:#e0708f; --alarm:#ef5f5f;
+  --mono:ui-monospace,"SF Mono",Menlo,Consolas,monospace;
+}
+*{box-sizing:border-box}
+html,body{height:100%}
+body{margin:0;background:var(--bg);color:var(--fg);font:14px/1.45 system-ui,-apple-system,Segoe UI,sans-serif;
+     display:flex;flex-direction:column;overflow:hidden}
+h1,h2{margin:0;font-weight:500}
+button,select,input{font:inherit;color:inherit}
+select{background:var(--panel2);border:1px solid var(--line);border-radius:6px;padding:4px 6px;max-width:100%}
+button{background:var(--panel2);border:1px solid var(--line);border-radius:6px;padding:6px 11px;cursor:pointer}
+button:hover{border-color:var(--dim)}
+:focus-visible{outline:2px solid var(--part);outline-offset:2px}
+
+header{display:flex;align-items:center;gap:14px;padding:10px 16px;background:var(--panel);border-bottom:1px solid var(--line);flex-wrap:wrap}
+header h1{font-size:16px;letter-spacing:.02em}
+header h1 small{display:block;font:400 11px/1.2 var(--mono);letter-spacing:.18em;text-transform:uppercase;color:var(--dim)}
+.tag{font:12px/1 var(--mono);padding:6px 9px;border-radius:6px;background:var(--panel2);border:1px solid var(--line);color:var(--mid)}
+.tag.live{color:var(--filter);border-color:#1e6d5a}
+.tag.ai{color:var(--env);border-color:#4a3f8f}
+.spacer{margin-left:auto}
+.danger{border-color:#5e2727;color:var(--alarm)}
+
+main{flex:1;display:grid;grid-template-columns:minmax(430px,1fr) minmax(420px,1.05fr);gap:10px;padding:10px;overflow:hidden}
+@media(max-width:1000px){main{grid-template-columns:1fr;overflow:auto}}
+.col{display:flex;flex-direction:column;gap:10px;min-height:0;overflow:auto;padding-right:2px}
+section{background:var(--panel);border:1px solid var(--line);border-radius:10px;display:flex;flex-direction:column;min-height:0}
+section>h2{font:500 11px/1 system-ui;letter-spacing:.18em;text-transform:uppercase;color:var(--mid);
+           padding:11px 13px;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:8px}
+section>h2::before{content:"";width:3px;height:13px;border-radius:2px;background:var(--accent,var(--mid))}
+section>h2 .note{margin-left:auto;font:400 11px/1 var(--mono);letter-spacing:0;text-transform:none;color:var(--dim)}
+.body{padding:11px 13px;overflow:auto;min-height:0}
+
+.mixhead,.mixrow{display:grid;grid-template-columns:26px minmax(90px,1fr) 1fr 62px 62px 30px 30px;gap:8px;align-items:center}
+.mixhead{font:11px/1 var(--mono);color:var(--dim);padding:0 2px 8px;text-transform:uppercase;letter-spacing:.08em}
+.mixrow{padding:4px 2px;border-radius:6px;border:1px solid transparent;cursor:pointer}
+.mixrow:hover{background:var(--panel2)}
+.mixrow[aria-current=true]{background:#152740;border-color:var(--part)}
+.mixrow b{font:500 11px/1 var(--mono);color:var(--dim)}
+.mixrow[aria-current=true] b{color:var(--part)}
+.mixrow select{font-size:12px;padding:3px 5px;width:100%}
+input[type=range]{-webkit-appearance:none;appearance:none;width:100%;height:16px;background:transparent;cursor:pointer}
+input[type=range]::-webkit-slider-runnable-track{height:4px;border-radius:2px;background:#0e1620;border:1px solid var(--line)}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:13px;height:13px;margin-top:-6px;border-radius:50%;background:var(--c,var(--part));border:none}
+input[type=range]::-moz-range-track{height:4px;border-radius:2px;background:#0e1620}
+input[type=range]::-moz-range-thumb{width:13px;height:13px;border:none;border-radius:50%;background:var(--c,var(--part))}
+.num{font:11px/1 var(--mono);color:var(--mid);text-align:right}
+.mini{padding:3px 0;font:11px/1 var(--mono);border-radius:4px;text-align:center}
+.mini[aria-pressed=true]{color:var(--alarm);border-color:#5e2727}
+.mini.solo[aria-pressed=true]{color:var(--mix);border-color:#6b4c15}
+
+.knobs{display:grid;grid-template-columns:repeat(auto-fit,minmax(78px,1fr));gap:6px}
+.knob{display:flex;flex-direction:column;align-items:center;gap:3px;padding:6px 2px;border-radius:8px;cursor:ns-resize;touch-action:none;border:1px solid transparent}
+.knob:hover{background:var(--panel2)}
+.knob.hit{border-color:var(--env)}
+.knob label{font-size:11px;color:var(--mid);text-align:center}
+.knob output{font:500 11px/1 var(--mono)}
+.pad{position:relative;width:100%;aspect-ratio:1/.8;background:var(--panel2);border:1px solid var(--line);border-radius:8px;touch-action:none;cursor:crosshair;overflow:hidden}
+.pad .g{position:absolute;background:#1e2836}
+.dot{position:absolute;width:20px;height:20px;margin:-10px 0 0 -10px;border-radius:50%;background:var(--filter);box-shadow:0 0 0 6px rgba(45,212,167,.15)}
+.two{display:grid;grid-template-columns:170px minmax(0,1fr);gap:12px}
+@media(max-width:600px){.two{grid-template-columns:1fr}}
+.elems{display:grid;grid-template-columns:repeat(auto-fit,minmax(96px,1fr));gap:7px}
+.elem{background:var(--panel2);border:1px solid var(--line);border-radius:7px;padding:7px}
+.elem header{all:unset;display:flex;justify-content:space-between;align-items:center;font:11px/1 var(--mono);color:var(--dim);margin-bottom:6px}
+.elem[data-on=false]{opacity:.42}
+.sw{width:26px;height:14px;border-radius:8px;background:#101822;border:1px solid var(--line);position:relative;cursor:pointer;padding:0}
+.sw i{position:absolute;top:1px;left:1px;width:10px;height:10px;border-radius:50%;background:var(--dim)}
+.elem[data-on=true] .sw i{left:13px;background:var(--elem)}
+.elem label{font-size:11px;color:var(--mid);display:flex;justify-content:space-between}
+
+.browser{display:grid;grid-template-columns:72px minmax(0,1fr);gap:11px;align-items:start}
+input[type=search]{width:100%;background:var(--panel2);border:1px solid var(--line);border-radius:6px;padding:5px 8px}
+.vrow{display:flex;gap:6px}
+.vrow select{flex:0 0 46%;font-size:12px}
+.vrow input[type=search]{flex:1;min-width:0}
+.voicepanel{display:flex;flex-direction:column;min-height:0}
+.vlist{margin-top:7px;max-height:132px;overflow:auto;border:1px solid var(--line);border-radius:7px;background:var(--panel2)}
+.vlist button{display:flex;width:100%;text-align:left;border:none;border-radius:0;background:transparent;padding:5px 8px;font-size:12px;color:var(--mid);gap:10px;align-items:center}
+.vlist .voice-name{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.vlist .voice-bank{margin-left:auto;flex:0 0 auto;font:10px/1 var(--mono);color:var(--dim)}
+.vlist button:hover{background:var(--panel3)}
+.vlist button[aria-current=true]{color:var(--part);background:#152740}
+.vlist p{margin:8px;font-size:12px;color:var(--dim)}
+.keybar{background:var(--panel);border-top:1px solid var(--line);padding:9px 14px;display:flex;gap:12px;align-items:center}
+.keybar[hidden]{display:none}
+.keys{position:relative;flex:1;min-width:0;height:66px;touch-action:none}
+.wk,.bk{position:absolute;top:0;border:1px solid #080d13;border-radius:0 0 3px 3px;cursor:pointer;padding:0}
+.wk{bottom:0;background:#dfe7f0}
+.bk{height:62%;background:#141b24;z-index:2}
+.wk[data-down=true],.bk[data-down=true]{background:var(--part)}
+.ccrow{display:grid;grid-template-columns:minmax(0,1fr) 60px 62px;gap:8px;align-items:center;
+  padding:2px 0;font-size:12px;color:var(--mid)}
+.ccrow input{width:100%;background:var(--panel2);border:1px solid var(--line);border-radius:5px;
+  padding:3px 5px;font:12px/1 var(--mono);text-align:right}
+.nat{font:10px/1 var(--mono);text-align:center;padding:4px 0;border-radius:4px;border:1px solid var(--line);color:var(--dim)}
+.nat.ok{color:var(--filter);border-color:#1e6d5a}
+.transport{display:flex;gap:8px;align-items:center;flex-wrap:wrap;
+  padding:8px 14px;background:var(--panel2);border-bottom:1px solid var(--line)}
+.transport button{font:12px/1 var(--mono);padding:7px 11px}
+.transport .name{flex:0 0 auto;max-width:220px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+#trec[aria-pressed=true]{color:var(--alarm);border-color:#5e2727;background:#2a1416}
+#tloop[aria-pressed=true]{color:var(--filter);border-color:#1e6d5a}
+.bar{flex:1;min-width:130px;height:9px;border-radius:5px;background:#0e1620;border:1px solid var(--line);
+     position:relative;cursor:pointer}
+.bar i{position:absolute;top:0;bottom:0;left:0;width:0;border-radius:5px;background:var(--filter)}
+.filebtn{font:12px/1 var(--mono);padding:7px 11px;border:1px solid var(--line);border-radius:6px;
+         background:var(--panel2);color:var(--fg);cursor:pointer}
+.filebtn:hover{border-color:var(--dim)}
+footer{background:var(--panel);border-top:1px solid var(--line);padding:8px 16px;font:12px/1.7 var(--mono);color:var(--mid);
+       display:flex;gap:16px;align-items:flex-start}
+#logs{flex:1;max-height:56px;overflow:auto}
+#logs div span{color:var(--dim)}
+#logs div.ai span{color:var(--env)}
+.fxview{margin-left:auto;padding:5px 9px;font:11px/1 var(--mono);letter-spacing:0;text-transform:none}
+.fxscroll{max-height:220px;overflow:auto;scrollbar-gutter:stable}
+.fxgroups{display:grid;gap:9px}
+.fxgroup{background:var(--panel2);border:1px solid var(--line);border-radius:8px;padding:9px;min-width:0}
+.fxgroup h3{margin:0 0 8px;font:500 12px/1.2 system-ui;color:var(--fg);display:flex;align-items:center;gap:8px}
+.fxgroup h3 small{margin-left:auto;font:10px/1 var(--mono);color:var(--dim);font-weight:400}
+.fxselect{display:flex;gap:8px;align-items:center;margin-bottom:8px}
+.fxselect label{display:flex;align-items:center;gap:7px;color:var(--mid);font-size:11px;min-width:0}
+.fxselect select{min-width:180px;max-width:100%}
+#fxsection.fx-all{position:fixed;z-index:30;inset:10px;box-shadow:0 18px 80px #000;border-color:var(--mix)}
+#fxsection.fx-all .fxscroll{max-height:none;flex:1}
+#fxsection.fx-all .fxgroups{grid-template-columns:repeat(auto-fit,minmax(320px,1fr));align-items:start}
+#fxsection.fx-all .fxgroup:first-child{grid-column:1/-1}
+#fxsection{order:2;flex:0 0 260px!important}
+#mixsection{flex:0 0 360px!important}
+body[data-rack-mode="voice"] #mixsection{flex-basis:145px!important}
+body[data-rack-mode="voice"] #mix .mixrow:not(:first-child){display:none}
+#voicesection.voice-all{position:fixed;z-index:31;inset:10px;box-shadow:0 18px 80px #000;border-color:var(--part)}
+#voicesection.voice-all .browser{flex:1;grid-template-columns:110px minmax(0,1fr);align-items:stretch}
+#voicesection.voice-all .vlist{max-height:none;flex:1}
+#voicesection.voice-all .vlist button{display:grid;grid-template-columns:minmax(120px,190px) minmax(0,1fr);gap:14px;padding:10px 12px;font-size:16px;align-items:center}
+#voicesection.voice-all .vlist .voice-name{font-size:16px}
+#voicesection.voice-all .vlist .voice-bank{margin-left:0;justify-self:start;font-size:14px;line-height:1.2}
+#voicesection.voice-all .vrow select,#voicesection.voice-all .vrow input{font-size:15px;padding:8px 10px}
+#voicesection.voice-all #vnote,#voicesection.voice-all #vsel{font-size:13px}
+#voicesection.voice-all #enc .knob{position:sticky;top:8px}
+main>.col:nth-child(2)>section:nth-child(1){order:1}
+main>.col:nth-child(2)>section:nth-child(2){order:3}
+main>.col:nth-child(2)>section:nth-child(3){order:4}
+@media(max-width:600px){#fxsection.fx-all{inset:4px}#fxsection.fx-all .fxgroups{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Beyhl Synth<small>V8 &middot; Motif Rack ES</small></h1>
+  <span class="tag live">OUT <select id="outsel" aria-label="MIDI-Ausgang"></select></span>
+  <span class="tag">IN <select id="insel" aria-label="MIDI-Eingang"></select></span>
+  <span class="tag live" title="Feste Yamaha-MIDI-Gerätenummer; am Rack darf DeviceNo auf all stehen">DEV 1 · fest</span>
+  <span class="tag">RACK <select id="rackmode" aria-label="Aktueller Modus des Rack ES"><option value="voice">VOICE</option><option value="multi">MULTI</option></select></span>
+  <button class="danger" id="rackesc" title="Wiedergabe und Effektbefehle sofort stoppen">MIDI STOP</button>
+  <span class="tag" id="chan">Part 1 · Kanal 1</span>
+  <span class="tag ai" id="aitag">IN: still</span>
+  <span class="spacer"></span>
+  <button id="kbtoggle" aria-pressed="true">Tastatur</button>
+  <label class="filebtn" for="vfile">Voice-Liste laden</label>
+  <input type="file" id="vfile" accept=".txt,.csv" hidden>
+  <button class="danger" id="panic">All notes off</button>
+</header>
+
+<div class="transport">
+  <span class="tag name" id="songname">kein Song</span>
+  <button id="tback" aria-label="Zum Anfang">&#9198; Anfang</button>
+  <button id="tplay">&#9654; Start</button>
+  <button id="tstop">&#9632; Stop</button>
+  <button id="trec" class="danger" aria-pressed="false">&#9679; Aufnahme</button>
+  <div class="bar" id="tbar" role="slider" tabindex="0" aria-label="Songposition"
+       aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><i id="tfill"></i></div>
+  <span class="tag" id="ttime">0:00 / 0:00</span>
+  <button id="tloop" aria-pressed="false">Loop</button>
+  <label class="filebtn" for="tfile">Song laden</label>
+  <input type="file" id="tfile" accept=".mid,.midi,audio/midi" hidden>
+  <button id="texport">.mid speichern</button>
+</div>
+
+<main>
+  <div class="col">
+    <section id="mixsection" style="--accent:var(--part);flex:1">
+      <h2><span id="mixmode">Mixer · 16 Parts</span> <span class="note" id="vnote">Voice-Liste: Platzhalter</span></h2>
+      <div class="body">
+        <div class="mixhead"><span>#</span><span>Voice</span><span>Volume</span><span>Pan</span><span>Hall</span><span>M</span><span>S</span></div>
+        <div id="mix"></div>
+      </div>
+    </section>
+
+    <section style="--accent:var(--elem)">
+      <h2>Elements <span class="note" id="elemnote">Part 1</span></h2>
+      <div class="body"><div class="elems" id="elems"></div></div>
+    </section>
+
+    <section style="--accent:var(--mid)">
+      <h2>CC-Zuordnung <span class="note" id="ccnote"></span></h2>
+      <div class="body">
+        <div id="cctab"></div>
+        <div style="display:flex;gap:8px;margin-top:10px">
+          <label class="filebtn" for="ccfile">Mapping laden</label>
+          <input type="file" id="ccfile" accept=".json,application/json" hidden>
+          <button id="ccsave">Mapping speichern</button>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <div class="col">
+    <section id="voicesection" style="--accent:var(--part)">
+      <h2>Voice <span class="note" id="vsel">Part 1</span><button class="fxview" id="voicetoggle" aria-pressed="false">Voices groß</button></h2>
+      <div class="body browser">
+        <div id="enc"></div>
+        <div class="voicepanel">
+          <div class="vrow">
+            <select id="banksel" aria-label="Bank"></select>
+            <input type="search" id="vsearch" placeholder="org…" aria-label="Voice suchen" autocomplete="off">
+          </div>
+          <div class="vlist" id="vlist"></div>
+        </div>
+      </div>
+    </section>
+
+    <section style="--accent:var(--filter)">
+      <h2>Filter <span class="note">cc74 / cc71</span></h2>
+      <div class="body two">
+        <div>
+          <div class="pad" id="pad" tabindex="0" role="slider" aria-label="Cutoff und Resonanz" aria-valuetext="Cutoff 76, Resonanz 51">
+            <div class="g" style="left:0;right:0;top:50%;height:1px"></div>
+            <div class="g" style="top:0;bottom:0;left:50%;width:1px"></div>
+            <div class="dot" id="dot" style="left:60%;top:40%"></div>
+          </div>
+          <p class="num" id="padout" style="text-align:left;margin:8px 0 0">cutoff 76 · resonanz 51</p>
+        </div>
+        <div class="knobs" id="fil"></div>
+      </div>
+    </section>
+
+    <section style="--accent:var(--env)">
+      <h2>Amplitude EG</h2>
+      <div class="body">
+        <svg viewBox="0 0 420 96" style="width:100%;height:96px;background:var(--panel2);border:1px solid var(--line);border-radius:8px" role="img" aria-label="Hüllkurve">
+          <polygon id="envfill" fill="#8b7bf7" opacity=".16"></polygon>
+          <polyline id="env" fill="none" stroke="#8b7bf7" stroke-width="2.5" stroke-linejoin="round"></polyline>
+        </svg>
+        <div class="knobs" id="eg" style="margin-top:9px"></div>
+      </div>
+    </section>
+
+    <section id="fxsection" style="--accent:var(--mix);flex:1">
+      <h2>Mix und Effekte <button class="fxview" id="fxtoggle" aria-pressed="false">Alle Effekte</button></h2>
+      <div class="body fxscroll" id="fxbody">
+        <div class="fxgroups">
+          <article class="fxgroup">
+            <h3><span id="fxmixlabel">Part und Mix</span> <small>Controller</small></h3>
+            <div class="knobs" id="fx"></div>
+          </article>
+          <article class="fxgroup">
+            <h3>Hall <small>System-Reverb</small></h3>
+            <div class="fxselect"><label>Typ <select id="revtype" aria-label="Halltyp"></select></label><button id="revapply">Typ anwenden</button></div>
+            <div class="knobs" id="revparams"></div>
+          </article>
+          <article class="fxgroup">
+            <h3>Chorus, Echo und Delay <small>System-Chorus</small></h3>
+            <div class="fxselect"><label>Typ <select id="chotype" aria-label="Chorus-, Echo- oder Delaytyp"></select></label><button id="choapply">Typ anwenden</button></div>
+            <div class="knobs" id="choparams"></div>
+          </article>
+        </div>
+      </div>
+    </section>
+  </div>
+</main>
+
+<div class="keybar" id="keybar">
+  <span class="tag" id="knote">—</span>
+  <div class="keys" id="keys" role="group" aria-label="Test-Tastatur"></div>
+  <span class="tag">Vel <input type="range" id="vel" min="1" max="127" value="100" style="width:80px;--c:var(--part);vertical-align:-3px"></span>
+  <button id="oct-">Okt −</button><span class="tag" id="octlabel">C3</span><button id="oct+">Okt +</button>
+</div>
+
+<footer>
+  <div id="logs"></div>
+  <span id="state">offline (Demo)</span>
+</footer>
+
+<script>
+const $ = s => document.querySelector(s);
+const logs = $("#logs"), state = $("#state"), aitag = $("#aitag");
+let CH = 1, RACK_MODE = "voice";
+const DEVICE_NIBBLE = 0; // DEV 1; am MOTIF-RACK ES funktioniert dazu DeviceNo = all.
+
+const DRUM_PRE = ["Hyper Std","DryStandrd","NewRock","RockSt1","RockSt2","RockMono1","RockMono2","Hip Hop1","Hip Hop2","Hip Hop3","Hip Hop4","Hip Hop5","Hip Hop6","HipStick1","HipStick2","HipStick3","HipStick4","T9HipKit1","T9HipKit2","R&B Kit1","R&B Kit2","R&B Kit3","AnalogT9","AnalogT8","Tekno Kit","House Kit1","House Kit2","Big Kit","Break Kit","Drum'nBass","Acid Kit","Jungle Kit","Electric","Human Kit","Hard Kit","Distorted","Ambient","Jazz Kit","Orchestral","Garage","All Round","Rock Multi","Hip Multi","Percussion","Latin Perc","Gtr/Bs Fx","Wacko Kit","Wood Bits","Metal Bits","Hands Kit","Scratches","AcstSnares","StSnares","AllKicks","DanceKick","EasySnares","Cuban","SynPopKit","Arabic Mix","BellyDance","DanceSnare","SpecialSFX","Synthetic","SFX Kit"];
+
+/* Offizielle Voice-Namen des MOTIF-RACK ES. Quelle:
+   MOTIF_RACK_ES_DataList_stimmt_mit_Rack.pdf */
+const RACK_VOICES = {"PRE1":["Full Grand","BriteGrand","Dark Grand","RomanticPf","Glasgow","Mono Grand","Tacky","Ragtime","Aggressive","HousePiano","Home Piano","Old Blues","1968","Mono Comp","78rpmPiano","BalladKey","80s Layer","BaladStack","PianoBack","Piano&Strg","Piano&Ooh","HardCP80","CP80&EP","Yama EP's","DynoStrait","ChorusDyno","ChorusHard","80th Boost","R&B Soft","Neo Soul","HrdVintage","Phaser Vin","1983","Soft Case","Early 70's","Vintage'74","Sweetness","VintagFase","Max Tine","Early Fusn","VintagCase","Contempo","Mr. Klank","E.PianoPad","BellChorus","FM E.Piano","BalladEP","SparkleTin","TX802","Bell DX","Dark DX","Beauty DX","GS Tines","AnaPiano","AhrAmI","Tine EP","Analog EP","WurliTrem","WurliAmped","Wurlix","Vintg Clav","SuperClavi","StereoClav","HollowClav","Nu Phasing","PulseClavi","TouchClavi","Marimbell1","Marimbell2","Kalimbell","Tibetan","Gamelan","HandBell","VibesBowMW","Metal Fish","BazaarBels","MysticBowl","Twinkle","Stick Bell","IceBells","ChorusBell","Bell Ice","Stack Bell","Bell Chiff","Nice Bell","NoisyBell","Sako Bell","J-Pop","SynStlDrm","ToyPiano","WoodBell","IslandBell","Log&Drum","Tmp/Bl/Glk","VelOrcPerc","Petit","Impromptu","Mixture","St. Paul","Fluty Pipe","St. Peter","Clean","Reed Split","Tradi","Sunday","BreathPipe","Reedy Pipe","Medieval","Prelude","Ooh Pipes","Green Tea","Bass Walk","Amped","Vintage C","Dave's B","2ndPerc","16+8+5&1/3","Jazzy 1","Jazzy 2","Glassy","Slow Jam","Greasy","Swishie","Full/CVib","Mellow","Nu Shade","Cool Cat","Flutey"],"PRE2":["LeftManual","DrawContrl","GosplSplit","Soulemn","Fully","Progressy","Crunchy","Rocky","DistFull","Early Bird","AnaDrwbr","Tiny","Paddy","Mellow Org","ResoDrbrs","OrgPad","Panther","SawCombo","1967 Keys","YD-45C","Compact","Spanish","Nylon+Harm","SimplSteel","SteelCmprs","Mute&Slide","Ac&Harmnic","SteelSwtch","Mega Steel","2StlStrngs","12Strings","12Str Mono","Mega 12str","El 12Strng","Strange 12","CleanEl&Ac","Jazzy Pick","JazzGtMelo","Velo Jazz","2CoilAmp1","2CoilAmp2","60sClean1","60sClean2","CleanSlap","Distant","SomeHair","MiddyTrem","CompDream","RotoGtr","Alt Rocker","Spanky","Vin Strum","1CoilChors","VinTremolo","HitItHard","PaddyClean","Policia","Rockabilly","Rotator","Baby","TouchWah","Mega Clean","OverDriven","TexBoogie","DynamicAmp","Drive","SnakeFingr","Feedbacker","KilrWhammy","Voodooman","CrunchyGtr","SmallAmp","LatinLover","Still Blue","59 Combo","BlueLead","Chugga","Metal Mute","OverTheTop","Beater","Mega OvrDv","Mega Dist","Upright","Groovin'Bs","VeloGrowl","Mega Acous","FingerPBs","PrecFW","RoundWound","ActiveP","FretBuzzy","3 Sixty Bs","S-VeeTee","GnarlyBs","Reggae","BaCement","MidRngFngr","HybridBs1","HybridBs2","PrecAmped","FingBsAmp","PBasFngDst","FuzzBass","MegaFngHrm","Velo Bass","SlapSwitch","Mega Fingr","Mega Slap","Chilli","PickOpen","PickPull","PickMuteDr","New Pick","Mega Pick","FretlesDry","FretlsSolo","Mega Frtls","Violin 1","Violin 2","Fiddler","Viola 1","Viola 2","Cello 1","Cello 2","Solo 1","Solo 2","SoloSpicat","ContraBass"],"PRE3":["2 Violins","2 Violas","2 Cellos","Cello Duet","2 Solos","CelloEnsem","ViolaEnsem","ViolnEnsem","CB. Sect","SmallSect1","SmallSect2","MediumEns","Violin Mix","SpicaLines","Hard Bow","BackGround","Hophead","HoleString","Ens Mix","Hard Ens","VeloString","BigStrings","Lush","MutedSect","BigSymphny","3 8ve Lush","3 8ve Hard","BeautyHarp","StereoHarp","PizzEns","PizzSect","Oct Pizz","OrchstrlPl","PWMStrings","Lightpad","Noble Pad","Romantic","Stringy","MournStrgs","JP Strings","3Osc Vintg","Superstrgs","VP Soft","PWM Simple","DblChorus","Old String","PhaseStrgs","Oct String","3 Octave","StrMachine","SS-40","TapeStrngs","SlowSuckr","TrpRomantc","PiccoloTpt","DynoTrumpt","SoftJazzTp","BaroqTrpt","Phase Mute","Legend","2 Trumpets","Fluegel","JazyFlugel","Trombone","BlownBone","BoneSectn","FrenchHorn","FrHornSect","Big French","MovieHorns","Symphonic","Symphony","SymphoBrs","SlowAttack","SoftVeloBr","Soft Brass","Velo Brass","SmlBrSect","Fanfare","Big&Brite","PowerSect","VeloFalls","StabDance","Mono Sect","Sforzando","Big Band 1","Big Band 2","SaxBigBand","Hybrid","HybridSect","VeloSynBr","CS-90","FM Brass","Thinth","QuietBrass","Big Syn","ObStuff","OberBrass","OberHorns","ObSoft","T Brass","BigSquish","Slow PWM","Soft 5th","Timeless","After 1984","Prophy","Kustom","Soprano","SoprnoSoft","Alto Vib","Velo Alto","Tenor Soft","TenorSax1","Hip Bari","4 Brothers","Sweet Oboe","SmoothOboe","BassoonVib","Clarinet 1","WW Trio","DblRdQuart","C Flute","SweetFlute","TapeFlute","IrishPipe","BluzDistrt","Campfire"],"PRE4":["TootsyHarp","WoodyHarp","Santur","Baglama","Kotoun","Kanun","Bazouk","Bouzuki","Oud","SazFeeze","IndianFlai","Tamburax","WhereAmI?","Sakura","Nomad","Ney","Kawala","Shukran","Zurna","Pungi","Shehnai 1","Digidoo","Gagaku","Kodo","Djerimbe","Mbira","GlassMbira","Tabla","Tabla 2","Tabla Zone","Udu","Djembe","Dhol","Kemence","Kemen Wet","Kokyu","Yayli","ChurchOohs","Dark Ooh","BrightHaah","Ooh-Aah","SynChoir","Nativity","PeaceVox","AngelVoice","SpaceChoir","Nebulae","GlassChoir","Shandala","AquaStop","Talk Box","Paradies","Westerlies","Tibet Ens.","Pan Sphere","Homesick","Atlantis","Forest","Analog","MellowAnlg","Square","BackPad MW","PWM Soft","Sine Pad","HighSine","The Synth","Ana Dreams","BrassMover","Dark Light","Twist Pad","Fat Eight","X-Shower","Digi Stuff","Pure Syn","Voxy Air","SmoothBlue","DarkVox","Ore","Fazer Pad","GreenGiant","Love me","Pearls","Ohm-Like","AllYouNeed","FrozenVox","Sand Pad","Digi Sheen","Eclipse","Arc-light","Grass Arp","SabreOrgan","Don't Cry!","Vapor","Silverlake","FrozenPad","Shine on","DarkTower","Sadness","Whisperer","MagicSquif","Keli Mutu","Mini Three","VintageSaw","Punch Lead","Bright Saw","OrbitSine","DuckLead","FunkyPulse","Trojan","Feeling","Crying","WoodPanel","VocoLead","JustASync","ThinkSync","Atk Reso","Early Lead","FlangeFilt","Free LFO","G-Funk","Lucky","PulseWound","PWM Lead","Rap Lead 1","Rap Lead 2","Soft RnB","Sine Lead","Singleline"],"PRE5":["Soft Lead","SpaceLead","I.C.U.2.","Mr. Finger","Mini Soft","Green Eyes","PulseWidth","Inda Night","NuMini","Clicky Saw","SimpleBass","Fat Sine","Dark Bass","OneVoice","BobbyBass","RnBass","Mini Sub","Fundamentl","FatSineRes","BalladBass","SingleOsc","Pro-Atack","SimpleReso","Funky Res","Unison","Moonbass","Long Spit","Sweeper","Bass&Comp!","Short PWM","Lately","Boogie A","Dark Uni","Boogie B","UniPunch","Boogie C","Clickie","Dry Syn","Bassline","KickBass","SomeDoubt","MiniClassc","West Coast","NeedleBs","Wazzo","VeloMaster","KeepDancin","Dave","Willows","Space","Network","Lazerzz","Wind Blows","Fire!","Bullrushes","Spacecraft","Storm","Liama Myst","Signals","FX-MWSweep","Dream Text","The Gate","Insanity","Crazy Mod","Doppler","Tron Blip","NevrRepeat","StoneArp","Hellfire","Omniflow","Flutter","Prisoner","Chromosome","Thieves","Lynch Mob","Ivi Atua","Cwmcarn","Alioth","China Bird","Arctis MW","Pad&Loop","Vespers","MIDI Rain","Missing","Algae","Glacy","Orch Hits","80's Hit","Chaser","CosmicRain","Galactic","Mckinley","Glass Tube","ModrnWinds","Red Dragon","Wireman","After All","QuickPunch","PolyMaster","BigComp","NoizRezz","RezzPunch","Straight","Light Comp","Cool Tech","Talker","Icing","Wobbly","A.J.","NightWatch","StringBell","Nightfall","Antares","Airy Nylon","Retro","NeoCrystal","Sweetland","Soleil","PopularSyn","Twilight","Long Walk","GX1","PWM Percu","ResoClavi","Ore-Tech","PlukdThing","PluckBells","Sine Comp"],"PRE6":["Aggressor","PNut Brit","British","Wavepanner","Pounder","Teck-no","FreshCut","Zhuffle","Vanilla","XDance","TrncHook","Portatone","Mayday MW","Moon Dots","Dyna Ring","Flangewall","Seraphim","BPFx","HPF+LPFpad","PWM Wall","Trance MW","Long HiPa","Pad&Syn","LFO String","Phat Dino","Big Drone","Big Lead","TrncMelody","FaaatDance","Fast PWM","Phat Three","BassPedal","Hypervelo","NoiseBass","Alias Bass","BassBubble","Boom Bass","Doom Bass","Pulse Step","Acidd","TranceBass","Ambi Bass","Deep Point","Phat Step","WinterBlue","Sprocket","Zippers","Ringvoxx","Crazy Bird","Bitzz MW","Dirtbox","P.S.O.L.","ProtoType","Bit Stream","Asp","XtremeRezz","Ambi Bite","RevReality","Francios","LoFi-Maj7","Ambi Pizz","Dark'n'Lit","MirrorRing","Clusters","Interlude","C Theme","Horizon","Talkmaster","Bit Space","Thexism","Cardomen","EkoWhistle","Fathoms","Moai","M-Trance","HPF Dance","PowerWheel","ShineChord","Hip Voice","Vocotouch","Voxy Ninth","Stabby","DetroitSta","Corrado","Hit&Down","FilterHit","Griffin","Olde Skool","Four Skids","TranceStab","UFOric","Strong Jam","Poly HPF","SweetNoize","Bollinger","Moet","Step Dance","QuadSwell","Slice Pad","Wake Up","CrushPadMW","EuroKidz","Oxide","DistortoBa","Old House","Dee Tune","VolumePedl","PolyTrance","SimplyRndm","Euro","Soft Ice","The Ripper","X-fade Pad","ChillGtr","QuietNight","Taken","Lost Ring","PlasmaWarp","Queens","Mizar","PulseSus","Pinz","Secrets","Ar-tic","My Reality","Gladiator","Chordz","Trancious"],"USER1":["Unplugged","FolkGuitar","Strum12Str","Thin Pick","ThickStrum","LazyChorus","Latin Jam","Slippery","Nylon Arp","WackaWacka","Touch Funk","Funk Star","Clean Funk","Riff Rock","Dist. Lick","VintageAmp","RockBackin","Wah Lead","OverTopArp","1stJazzBas","GroovinArp","FunkFinger","Basman12/8","Slapper","No Frettin","PickedBass","Buzzy Pick","MellowBass","FingerComp","Salsalicio","Montuno","Mutey Arp","1FingerRck","ClubBackin","VintageArp","Arp Clavi","House Org","Bali Bells","Bell Shop","StringPart","The Sneak","Pizz Arp","Harp Arp","HeavenSent","Quiet Orch","Funk Bros","Fall Arp","Velo Flute","OrcDrummer","BaglamaArp","Karbala 1","Karbala 2","Ney Arp","Sunny","Afro","Ethnology","Funk Delhi","FX Jam","Rap Top","MouthShots","R&B Solo","Kick Off","Embassy","Mocha","Safari","Punchy Saw","Mr. Groovy","StarDrop","SyncArp 1","Madhouse","CompingPd","80's Ens","Tribal","SyncArp 2","Orongo","Chinese","Neptune","Magician","Basic Arp","Soundwork","For Bertje","ANbasicARP","Particle","FuzzMorf","LighTek","Creme Cafe","Tangerine","Chocolate","Sushima","Metaloop","Technokrat","Hi 2 Lo MW","Engineer","Ghana Rain","SeqPad","Creamy","Waterproof","RingBell","SpectrmArp","The Hunter","Himalya","Bass'n Pad","Multi Mod","Surprise","Quo Vadis","Metal Arp","DreaminOfU","TransmittR","Zynitas","Pistachio","X-Wave","Cherry","Elec Drum","SimpleSize","Straighter","BollogPuls","Strawberry","Neon Soda","Magnetics","Elc.Music","ChillOut","In My Head","Racer","Jitter","Sand ES","V.S.E.Seq","Dawn","LuxAeterna"],"USER2":["Vanilla","Nightfall","BigStrings","Full Grand","Progressy","Analog","Unplugged","FunkFinger","Missing","Oud","FaaatDance","Vintage'74","Big&Brite","Pearls","Velo Flute","SimpleBass","Bass'n Pad","Stack Bell","2 Violins","Piano&Strg","BreathPipe","Homesick","Wah Lead","VeloGrowl","NevrRepeat","PizzSect","Big Drone","WurliTrem","TrpRomantc","PhaseStrgs","Alto Vib","JustASync","Zhuffle","Paradies","BackGround","Old Blues","Soulemn","Ooh-Aah","OverDriven","SlapSwitch","Network","Santur","HPF Dance","Nu Phasing","MovieHorns","Forest","Ney","Pro-Atack","Wavepanner","J-Pop","SmallSect1","Ragtime","Sunday","X-Shower","Nylon+Harm","FretBuzzy","P.S.O.L.","StereoHarp","TrncMelody","Bell DX","Legend","Eclipse","Sweet Oboe","Soft RnB","PNut Brit","StringBell","MediumEns","RomanticPf","Full/CVib","ChurchOohs","Baby","FretlsSolo","Sprocket","Tabla Zone","Hypervelo","Contempo","SmlBrSect","Tibet Ens.","Kawala","Boogie A","Engineer","Bell Chiff","CelloEnsem","Aggressive","Dave's B","PWM Soft","60sClean1","PickMuteDr","StoneArp","IndianFlai","Portatone","SuperClavi","VeloFalls","Silverlake","TenorSax1","OrbitSine","80's Ens","Soleil","Hophead","BriteGrand","Amped","BrightHaah","Feedbacker","S-VeeTee","Crazy Mod","Dhol","Dyna Ring","R&B Soft","HybridSect","ModrnWinds","IrishPipe","Short PWM","Pounder","Wireman","HoleString","CP80&EP","Ooh Pipes","Old String","1CoilChors","New Pick","Spacecraft","Log&Drum","Mayday MW","DynoStrait","Trombone","Lynch Mob","DblRdQuart","SpaceLead"],"USER3":["Heavy Db","Krew Rolls","BlingBlang","Sushi","Turntablz","Sample #12","Softbeat 1","Softbeat 2","Uptown","VinylBumps","Truck Beat","Wizzo","$olid","Komp","RotoBass","Phat Sub","Korrused","DropWax","RadioRoadz","Harp-C-Krd","Hip Koto","DaFunkMan","Mystereez","Stakkd","Play Toy","KrakdBrass","KrakdStrgs","RapStrngs1","RapStrngs2","M strings","Vinylins","WheelsDave","16-8-4-2","16-4-2-1","VintageC 2","VintageC 3","91 Wheels","Leakage","ThruGtrAmp","DblManual","Thank You","Pale Shade","RedPlastic","Zombie B","Shutdown","TekkNow MW","Pizza No.1","Deadline","EleXon MW","XtremeHarp","Alaska","Bros&Sist","Trip Top","Perculator","Dream Keys","MagnoChill","SlicedKeys","Wide Clavi","Ragamuffin","Str Bell 2","Butterfly","Tube DX","Warm Comp","Reso Comp","Dripping","Eighties","VintgSync","Magnetix","Flangerous","Mr. Smooth","Wire Stabs","Airy Pad","Hilly","Silence","Warm Swell","CircleLine","High Wire","DanceStabs","Xtrafat","Power Hit","Magic Key","The Breath","Faaat S&H","CP 80","ToyPiano 2","Fullbodied","Sunshine","DualPhase","Lacquered","80sSession","VintgWurly","GrittyWurl","CompactEP","Clav Dee","DX 1","GS Tines 2","DX 2","Transistor","National","GetFooled","Brass T","1990-fine","CS80","Mini Bass","Grounded","Threat","BlueSquare","Mini Lead","TripleLead","Ap Lead 1","Ap Lead 2","SciFiSynth","V strings","DX Synthy","ReversePad","Ominoso","Rainbows","Wonderstar","Delhi-cut","Bounceoid","Shinkansen","Mesmerized","Ring Mod","LiquidMetl","Gong Kong","Automachin","Sugarcubed","Da Mystic"],"GM":["ConcertGnd","Rock Brite","CP 2001","Honkytonk","E.Piano 1","E.Piano 2","Harpsicord","Brite Clav","Celeste","Glocken","Music Box","Vibes","Marimba","Xylophone","TubulrBel","Dulcimar","Draw Organ","Perc Organ","Rock Organ","ChurchOrgn","Reed Organ","Accordion","Harmonica","TangoAccrd","Velo Nylon","Steel","ModernJazz","Clean Gt","Mute","Overdrive","Distortion","Harmonics","Acoustic","FingerBass","PickBass","Fretless","SimpleSlap","FingSlp SW","SynthBass1","SynthBass2","Violin 3","Viola 3","Cello 3","Contrabass","TremoloStr","Pizz","Harp","Tmpni+Cym","StereoSt1","StereoSt2","Grand Saw","SynString","Aah Choir","Ooh Choir","Syn Voice","Orch.Hit","Trumpet","Trombone2","Tuba","MuteTrpt","F.Horns","Brass Sect","SynthBrass","SoftBrs GM","Soprano2","Alto Sax","TenorSax2","Bari Sax","Oboe","Eng.Horn","Bassoon","Clarinet 2","Piccolo","Flute","Recorder","Panflute","Bottle","Shakuhachi","Whistle","Ocarina","Square Ld","Saw Ld","Caliop Ld","Chiff Ld","Charan Ld","Voice Ld","Fifth Ld","Bass&Ld","New Age","Warm Pad","Poly Synth","Choir Pad","BowedPad","Metal Pad","Halo Pad","Sweep Pad","Rain Pad","SoundTrack","Crystal","Atmosphere","Brightness","Goblin","Echoes","Sci-Fi","Sitar","Banjo","Shamisen","Koto","Kalimba","Bagpipe","Fiddle","Shehnai 2","Tinkerbel","Agogo","Steeldrum","Woodblock","Taikodrum","MelodicTom","Synth Drum","Rev Cymbal","Fret Noise","BreathNoiz","Seashore","Tweet","Telephone","Helicopter","Applause","Gunshot"]};
+const BANKS = [
+  {name:"PRE1 · 63/0", msb:63, lsb:0, voices:RACK_VOICES.PRE1},
+  {name:"PRE2 · 63/1", msb:63, lsb:1, voices:RACK_VOICES.PRE2},
+  {name:"PRE3 · 63/2", msb:63, lsb:2, voices:RACK_VOICES.PRE3},
+  {name:"PRE4 · 63/3", msb:63, lsb:3, voices:RACK_VOICES.PRE4},
+  {name:"PRE5 · 63/4", msb:63, lsb:4, voices:RACK_VOICES.PRE5},
+  {name:"PRE6 · 63/5", msb:63, lsb:5, voices:RACK_VOICES.PRE6},
+  {name:"USER1 · 63/8", msb:63, lsb:8, voices:RACK_VOICES.USER1},
+  {name:"USER2 · 63/9", msb:63, lsb:9, voices:RACK_VOICES.USER2},
+  {name:"USER3 · 63/10", msb:63, lsb:10, voices:RACK_VOICES.USER3},
+  {name:"GM · 0/0", msb:0, lsb:0, voices:RACK_VOICES.GM}
+].concat([
+  {name:"Drum PRE · 63/32", msb:63, lsb:32, voices:DRUM_PRE},
+  {name:"Drum USER · 63/40", msb:63, lsb:40, voices:Array.from({length:32},(_,i)=>"User Drum "+(i+1))},
+  {name:"GM Drum · 127/0", msb:127, lsb:0, voices:["Stereo GM"]}
+]);
+let BANKI = 0;
+const VOICES = BANKS[0].voices;
+
+function line(txt, ai){
+  const d = document.createElement("div");
+  if(ai) d.className = "ai";
+  d.innerHTML = "<span>" + (ai ? "ki  " : "du  ") + new Date().toLocaleTimeString() + "</span>  " + txt;
+  logs.prepend(d);
+  while(logs.children.length > 30) logs.lastChild.remove();
+}
+
+function knob(host, {label, cc, value, color, id}){
+  const el = document.createElement("div");
+  el.className = "knob"; el.tabIndex = 0; el.setAttribute("role","slider");
+  el.setAttribute("aria-label", label); el.setAttribute("aria-valuemin",0); el.setAttribute("aria-valuemax",127);
+  el.innerHTML = '<svg width="50" height="50" viewBox="0 0 56 56" aria-hidden="true">'
+    + '<circle cx="28" cy="28" r="21" fill="none" stroke="#25303f" stroke-width="5"></circle>'
+    + '<circle class="arc" cx="28" cy="28" r="21" fill="none" stroke="' + color + '" stroke-width="5" stroke-linecap="round"'
+    + ' transform="rotate(135 28 28)" stroke-dasharray="132" stroke-dashoffset="132"></circle>'
+    + '<line class="ptr" x1="28" y1="28" x2="28" y2="11" stroke="' + color + '" stroke-width="2.5" stroke-linecap="round"></line>'
+    + '</svg><label>' + label + '</label><output></output>';
+  const arc = el.querySelector(".arc"), ptr = el.querySelector(".ptr"), out = el.querySelector("output");
+  let v = value, ccNum = cc;
+  const paint = () => {
+    arc.setAttribute("stroke-dashoffset", Math.round(132 - v / 127 * 99));
+    ptr.setAttribute("transform", "rotate(" + Math.round(-135 + v / 127 * 270) + " 28 28)");
+    out.textContent = Math.round(v) + (ccNum ? " · cc" + ccNum : " · —");
+    el.setAttribute("aria-valuenow", Math.round(v));
+  };
+  const api = {el, get: () => v, getCC: () => ccNum,
+    setCC(n){ ccUnindex(ccNum, api); ccNum = n; ccIndex(ccNum, api); paint(); },
+    set(n, quiet){ v = Math.min(127, Math.max(0, n)); paint();
+      if(!quiet && ccNum) send("cc", ccNum, Math.round(v)); drawEnv(); }};
+  el.addEventListener("pointerdown", e => {
+    el.setPointerCapture(e.pointerId); const y0 = e.clientY, v0 = v;
+    const mv = ev => api.set(v0 + (y0 - ev.clientY) * 0.8, true);
+    el.addEventListener("pointermove", mv);
+    el.addEventListener("pointerup", () => { el.removeEventListener("pointermove", mv);
+      if(ccNum) send("cc", ccNum, Math.round(v)); }, {once:true});
+  });
+  el.addEventListener("keydown", e => {
+    const s = e.shiftKey ? 10 : 1;
+    if(e.key === "ArrowUp" || e.key === "ArrowRight"){ api.set(v + s); e.preventDefault(); }
+    if(e.key === "ArrowDown" || e.key === "ArrowLeft"){ api.set(v - s); e.preventDefault(); }
+  });
+  paint(); host.appendChild(el);
+  if(id) KN[id] = api;
+  ccIndex(ccNum, api);
+  CCREG.push({label, get: () => ccNum, set: n => api.setCC(n)});
+  return api;
+}
+const KN = {}, KNBYCC = {}, CCREG = [];
+function ccIndex(cc, api){ if(cc) (KNBYCC[cc] = KNBYCC[cc] || []).push(api); }
+function ccUnindex(cc, api){
+  const l = KNBYCC[cc]; if(!l) return;
+  const i = l.indexOf(api); if(i >= 0) l.splice(i, 1);
+}
+
+const MIXCC = {vol:7, pan:10, rev:91};
+const mix = $("#mix"), rows = [];
+VOICES.slice(0,16).forEach((name, i) => {
+  const row = document.createElement("div");
+  row.className = "mixrow"; row.setAttribute("aria-current", i === 0);
+  row.innerHTML = '<b>' + String(i+1).padStart(2,"0") + '</b>'
+    + '<select aria-label="Voice Part ' + (i+1) + '">' + VOICES.map((v,j) => '<option' + (j===i?' selected':'') + '>' + v + '</option>').join("") + '</select>'
+    + '<input type="range" min="0" max="127" value="' + (80 + (i*5) % 40) + '" style="--c:var(--part)" aria-label="Volume Part ' + (i+1) + '">'
+    + '<input type="range" min="0" max="127" value="64" style="--c:var(--mid)" aria-label="Pan Part ' + (i+1) + '">'
+    + '<input type="range" min="0" max="127" value="' + (30 + (i*11) % 60) + '" style="--c:var(--mix)" aria-label="Hall Part ' + (i+1) + '">'
+    + '<button class="mini" aria-pressed="false" title="Mute">M</button>'
+    + '<button class="mini solo" aria-pressed="false" title="Solo">S</button>';
+  const [vol, pan, rev] = row.querySelectorAll("input");
+  const [mute, solo] = row.querySelectorAll("button");
+  const ch = i + 1;
+  vol.oninput = () => send("cc", MIXCC.vol, Math.round(vol.value), ch);
+  pan.oninput = () => send("cc", MIXCC.pan, Math.round(pan.value), ch);
+  rev.oninput = () => send("cc", MIXCC.rev, Math.round(rev.value), ch);
+  mute.onclick = e => { e.stopPropagation();
+    const on = mute.getAttribute("aria-pressed") === "true"; mute.setAttribute("aria-pressed", !on);
+    send("cc", MIXCC.vol, on ? Math.round(vol.value) : 0, ch); };
+  solo.onclick = e => { e.stopPropagation();
+    const on = solo.getAttribute("aria-pressed") === "true"; solo.setAttribute("aria-pressed", !on);
+    rows.forEach((r, j) => { if(j !== i) r.vol.dispatchEvent(new Event("input")); });
+    line("solo part " + ch + (on ? " aus" : " ein")); };
+  row.onclick = () => select(i);
+  mix.appendChild(row);
+  const sel = row.querySelector("select");
+  sel.onchange = e => { e.stopPropagation(); select(i); pickVoice(sel.value); };
+  rows.push({row, vol, pan, rev, ch, sel});
+});
+
+CCREG.push({label:"Part Volume", get: () => MIXCC.vol, set: n => MIXCC.vol = n});
+CCREG.push({label:"Part Pan", get: () => MIXCC.pan, set: n => MIXCC.pan = n});
+CCREG.push({label:"Part Hall", get: () => MIXCC.rev, set: n => MIXCC.rev = n});
+
+function select(i){
+  if(RACK_MODE === "voice") i = 0;
+  rows.forEach((r, j) => r.row.setAttribute("aria-current", j === i));
+  CH = i + 1;
+  $("#chan").textContent = "Part " + CH + " · Kanal " + CH;
+  $("#elemnote").textContent = "Part " + CH + " · " + rows[i].sel.value;
+  if(window.refreshVoice) refreshVoice();
+}
+
+const elems = $("#elems");
+/* Normal Voice des ES hat maximal vier Elemente. Level/Tune/Schalter laufen ueber frei
+   zuweisbare Controller – im Motif unter Voice Edit → CtrlSet auf das Ziel legen. */
+const ELEMCC = [{lvl:20, tune:24, sw:28}, {lvl:21, tune:25, sw:29},
+                {lvl:22, tune:26, sw:30}, {lvl:23, tune:27, sw:31}];
+for(let e = 1; e <= 4; e++){
+  const cfg = ELEMCC[e - 1];
+  const d = document.createElement("div");
+  d.className = "elem"; d.dataset.on = "true";
+  d.innerHTML = '<header>Element ' + e + '<button class="sw" role="switch" aria-checked="true" aria-label="Element ' + e + ' ein"><i></i></button></header>'
+    + '<label>Level <span>' + (104 - e*4) + '</span></label><input type="range" min="0" max="127" value="' + (104 - e*4) + '" style="--c:var(--elem)" aria-label="Element ' + e + ' Level">'
+    + '<label style="margin-top:5px">Tune <span>0</span></label><input type="range" min="-64" max="63" value="0" style="--c:var(--elem)" aria-label="Element ' + e + ' Tune">';
+  const sw = d.querySelector(".sw"), ins = d.querySelectorAll("input");
+  const [lvl, tune] = ins;
+  const show = inp => inp.previousElementSibling.querySelector("span").textContent = inp.value;
+  sw.onclick = () => {
+    const on = d.dataset.on !== "true";
+    d.dataset.on = on; sw.setAttribute("aria-checked", on);
+    if(cfg.sw) send("cc", cfg.sw, on ? 127 : 0);
+    else line("Element " + e + (on ? " ein" : " aus") + " – kein CC zugeordnet");
+  };
+  lvl.oninput = () => { show(lvl); if(cfg.lvl) send("cc", cfg.lvl, Number(lvl.value)); };
+  tune.oninput = () => { show(tune); if(cfg.tune) send("cc", cfg.tune, Number(tune.value) + 64); };
+  elems.appendChild(d);
+  CCREG.push({label:"Element " + e + " Level", get: () => cfg.lvl, set: n => cfg.lvl = n});
+  CCREG.push({label:"Element " + e + " Tune",  get: () => cfg.tune, set: n => cfg.tune = n});
+  CCREG.push({label:"Element " + e + " ein/aus", get: () => cfg.sw, set: n => cfg.sw = n});
+}
+
+knob($("#fil"), {label:"Cutoff", cc:74, value:76, color:"#2dd4a7", id:"cut"});
+knob($("#fil"), {label:"Resonanz", cc:71, value:51, color:"#2dd4a7", id:"res"});
+knob($("#fil"), {label:"EG Depth", cc:70, value:44, color:"#2dd4a7"});
+[["Attack",73,20],["Decay",75,60],["Sustain",79,90],["Release",72,70]]
+  .forEach(([l,cc,v]) => knob($("#eg"), {label:l, cc, value:v, color:"#8b7bf7", id:l.toLowerCase()}));
+[["Volume",7,100],["Pan",10,64],["Hall",91,64],["Chorus",93,20],["Expression",11,127],["Portamento",5,0],["Brightness",74,76],["Mod",1,0]]
+  .forEach(([l,cc,v]) => knob($("#fx"), {label:l, cc, value:v, color:"#f2a33c"}));
+
+/* ============ Rack-ES Systemeffekte per SysEx ============ */
+const REV_TYPES = [
+  ["Aus",0x00,0x00,"other"], ["Hall 1",0x01,0x00,"hall"], ["Hall 2",0x01,0x01,"hall"],
+  ["R3 Hall",0x01,0x02,"hall"], ["Large Hall",0x01,0x08,"hall"], ["Medium Hall",0x01,0x09,"hall"],
+  ["Room 1",0x01,0x10,"hall"], ["Room 2",0x01,0x11,"hall"], ["Room 3",0x01,0x12,"hall"],
+  ["R3 Room",0x01,0x13,"hall"], ["Warm Room",0x01,0x18,"hall"], ["Woody Room",0x01,0x19,"hall"],
+  ["Stage 1",0x01,0x20,"hall"], ["Stage 2",0x01,0x21,"hall"], ["Plate",0x01,0x30,"hall"],
+  ["R3 Plate",0x01,0x31,"hall"], ["Rich Plate",0x01,0x38,"hall"], ["White Room",0x01,0x40,"hall"],
+  ["Tunnel",0x01,0x41,"hall"], ["Basement",0x01,0x42,"hall"], ["Canyon",0x01,0x43,"hall"]
+].map(([name,msb,lsb,family]) => ({name,msb,lsb,family}));
+
+const CHO_TYPES = [
+  ["Aus",0x00,0x00,"other"],
+  ["Hall 1",0x01,0x00,"hall"], ["Hall 2",0x01,0x01,"hall"], ["Room 1",0x01,0x10,"hall"],
+  ["Room 2",0x01,0x11,"hall"], ["Room 3",0x01,0x12,"hall"], ["Stage 1",0x01,0x20,"hall"],
+  ["Stage 2",0x01,0x21,"hall"], ["Plate",0x01,0x30,"hall"],
+  ["Delay L/C/R",0x02,0x00,"delay"], ["Delay L/R",0x02,0x10,"delay"],
+  ["Delay L/R Stereo",0x02,0x18,"delay"], ["Echo",0x02,0x20,"echo"], ["Cross Delay",0x02,0x30,"delay"],
+  ["Tempo Delay Mono",0x02,0x50,"tempo"], ["Tempo Delay Stereo",0x02,0x58,"tempo"],
+  ["Tempo Cross Delay",0x02,0x60,"tempo"],
+  ["Early Reflection 1",0x03,0x00,"other"], ["Early Reflection 2",0x03,0x01,"other"],
+  ["Gate Reverb",0x03,0x10,"other"], ["Reverse Gate",0x03,0x20,"other"],
+  ["Karaoke 1",0x04,0x00,"other"], ["Karaoke 2",0x04,0x01,"other"], ["Karaoke 3",0x04,0x02,"other"],
+  ["Chorus 1",0x05,0x00,"chorus"], ["Chorus 2",0x05,0x01,"chorus"], ["Chorus 3",0x05,0x02,"chorus"],
+  ["Chorus 4",0x05,0x08,"chorus"], ["Chorus 5",0x05,0x09,"chorus"],
+  ["Celeste 1",0x05,0x10,"chorus"], ["Celeste 2",0x05,0x11,"chorus"],
+  ["Celeste 3",0x05,0x12,"chorus"], ["Celeste 4",0x05,0x18,"chorus"],
+  ["Symphonic",0x05,0x20,"chorus"], ["Ensemble Detune",0x05,0x30,"chorus"],
+  ["Flanger 1",0x06,0x00,"chorus"], ["Flanger 2",0x06,0x01,"chorus"], ["Flanger 3",0x06,0x08,"chorus"],
+  ["V-Flanger",0x06,0x10,"chorus"], ["Vintage Flanger 1",0x06,0x20,"chorus"],
+  ["Vintage Flanger 2",0x06,0x21,"chorus"], ["Vintage Flanger 3",0x06,0x22,"chorus"],
+  ["Tempo Flanger",0x06,0x50,"chorus"], ["Phaser 1",0x07,0x00,"chorus"], ["Phaser 2",0x07,0x08,"chorus"],
+  ["Vintage Phaser Stereo 1",0x07,0x20,"chorus"], ["Vintage Phaser Stereo 2",0x07,0x21,"chorus"],
+  ["Vintage Phaser Mono 1",0x07,0x30,"chorus"], ["Vintage Phaser Mono 2",0x07,0x31,"chorus"],
+  ["Tempo Phaser",0x07,0x50,"chorus"]
+].map(([name,msb,lsb,family]) => ({name,msb,lsb,family}));
+
+const TEMPO_NAMES = ["32tel Triole","64tel punktiert","32tel","16tel Triole","32tel punktiert","16tel",
+  "8tel Triole","16tel punktiert","8tel","4tel Triole","8tel punktiert","4tel","Halbe Triole",
+  "4tel punktiert","Halbe","Ganze Triole","Halbe punktiert","4 Takte","5 Takte","6 Takte"];
+function hallTimeLabel(v){
+  if(v <= 47) return ((v + 3) / 10).toFixed(1) + " s";
+  if(v <= 57) return (5.5 + (v - 48) * .5).toFixed(1) + " s";
+  if(v <= 67) return (11 + v - 58).toFixed(1) + " s";
+  return (v === 68 ? "25.0" : "30.0") + " s";
+}
+const HALL_PARAMS = [
+  {no:1,label:"Hallzeit",min:0,max:69,value:35,format:hallTimeLabel}, {no:2,label:"Diffusion",min:0,max:10,value:6},
+  {no:3,label:"Anfangsverz.",min:0,max:127,value:10}, {no:4,label:"Tiefenfilter",min:0,max:52,value:20},
+  {no:5,label:"Höhenfilter",min:34,max:60,value:52}, {no:11,label:"Hall-Verz.",min:0,max:127,value:8},
+  {no:12,label:"Dichte",min:0,max:4,value:3}, {no:13,label:"Reflex/Hall",min:1,max:127,value:64},
+  {no:14,label:"Höhendämpf.",min:1,max:10,value:8,format:v=>(v/10).toFixed(1)},
+  {no:15,label:"Rückkopplung",min:1,max:127,value:64,format:v=>String(v-64)}
+];
+const ECHO_PARAMS = [
+  {no:1,label:"Zeit links 1",min:1,max:16383,value:3500,format:v=>(v/10).toFixed(1)+" ms"},
+  {no:2,label:"Feedback links",min:1,max:127,value:72,format:v=>String(v-64)},
+  {no:3,label:"Zeit rechts 1",min:1,max:16383,value:4200,format:v=>(v/10).toFixed(1)+" ms"},
+  {no:4,label:"Feedback rechts",min:1,max:127,value:72,format:v=>String(v-64)},
+  {no:5,label:"Höhendämpf.",min:1,max:10,value:8,format:v=>(v/10).toFixed(1)},
+  {no:6,label:"Zeit links 2",min:1,max:16383,value:1750,format:v=>(v/10).toFixed(1)+" ms"},
+  {no:7,label:"Zeit rechts 2",min:1,max:16383,value:2100,format:v=>(v/10).toFixed(1)+" ms"},
+  {no:8,label:"Echo 2 Pegel",min:0,max:127,value:72}, {no:10,label:"Trocken/Effekt",min:1,max:127,value:80,format:v=>String(v-64)}
+];
+const DELAY_PARAMS = [
+  {no:1,label:"Verzögerung 1",min:1,max:16383,value:3000,format:v=>(v/10).toFixed(1)+" ms"},
+  {no:2,label:"Verzögerung 2",min:1,max:16383,value:4000,format:v=>(v/10).toFixed(1)+" ms"},
+  {no:3,label:"Verzögerung 3",min:1,max:16383,value:2500,format:v=>(v/10).toFixed(1)+" ms"},
+  {no:4,label:"Verzögerung 4",min:1,max:16383,value:3500,format:v=>(v/10).toFixed(1)+" ms"},
+  {no:5,label:"Rückkopplung",min:1,max:127,value:72,format:v=>String(v-64)},
+  {no:6,label:"Pegel",min:0,max:127,value:90}, {no:7,label:"Höhendämpf.",min:1,max:10,value:8,format:v=>(v/10).toFixed(1)},
+  {no:10,label:"Trocken/Effekt",min:1,max:127,value:80,format:v=>String(v-64)}
+];
+const TEMPO_PARAMS = [
+  {no:1,label:"Notenwert",min:0,max:19,value:11,format:v=>TEMPO_NAMES[v] || String(v)},
+  {no:2,label:"Rückkopplung",min:1,max:127,value:72,format:v=>String(v-64)},
+  {no:3,label:"Höhendämpf.",min:1,max:10,value:8,format:v=>(v/10).toFixed(1)},
+  {no:4,label:"L/R-Abstand",min:1,max:127,value:64,format:v=>String(v-64)},
+  {no:5,label:"Versatz",min:1,max:127,value:64,format:v=>String(v-64)},
+  {no:10,label:"Trocken/Effekt",min:1,max:127,value:80,format:v=>String(v-64)}
+];
+const CHORUS_PARAMS = [
+  {no:1,label:"Geschwindigkeit",min:0,max:127,value:45}, {no:2,label:"Tiefe",min:0,max:127,value:60},
+  {no:3,label:"Rückkopplung",min:1,max:127,value:64,format:v=>String(v-64)},
+  {no:4,label:"Verz.-Versatz",min:0,max:127,value:40}, {no:10,label:"Trocken/Effekt",min:1,max:127,value:76,format:v=>String(v-64)},
+  {no:11,label:"Mittenfrequenz",min:14,max:54,value:34}, {no:12,label:"Mittenpegel",min:52,max:76,value:64,format:v=>String(v-64)},
+  {no:13,label:"Mittenbreite",min:1,max:120,value:60}
+];
+const GENERIC_PARAMS = Array.from({length:10},(_,i)=>({no:i+1,label:"Parameter "+(i+1),min:0,max:127,value:64}));
+
+function split14(value){ const n = Math.max(0,Math.min(16383,Math.round(value))); return [(n>>7)&127,n&127]; }
+function fxBaseAddress(){
+  if(RACK_MODE === "multi") return 0x36;
+  const bank = BANKS[BANKI];
+  return bank && (bank.msb === 127 || (bank.msb === 63 && (bank.lsb === 32 || bank.lsb === 40))) ? 0x46 : 0x40;
+}
+function motifParam(address, data, label){
+  raw([0xF0,0x43,0x10 | DEVICE_NIBBLE,0x7F,0x00,address[0]&127,address[1]&127,address[2]&127,...data.map(x=>x&127),0xF7]);
+  line((label || "Rack-Parameter") + " → " + data.join("/"));
+}
+function syxKnob(host, cfg, commit){
+  const el = document.createElement("div");
+  el.className = "knob"; el.tabIndex = 0; el.setAttribute("role","slider");
+  el.setAttribute("aria-label",cfg.label); el.setAttribute("aria-valuemin",cfg.min); el.setAttribute("aria-valuemax",cfg.max);
+  el.innerHTML = '<svg width="50" height="50" viewBox="0 0 56 56" aria-hidden="true">'
+    + '<circle cx="28" cy="28" r="21" fill="none" stroke="#25303f" stroke-width="5"></circle>'
+    + '<circle class="arc" cx="28" cy="28" r="21" fill="none" stroke="#f2a33c" stroke-width="5" stroke-linecap="round" transform="rotate(135 28 28)" stroke-dasharray="132"></circle>'
+    + '<line class="ptr" x1="28" y1="28" x2="28" y2="11" stroke="#f2a33c" stroke-width="2.5" stroke-linecap="round"></line>'
+    + '</svg><label>'+cfg.label+'</label><output></output>';
+  const arc=el.querySelector(".arc"), ptr=el.querySelector(".ptr"), out=el.querySelector("output");
+  let value = cfg.value;
+  const set = (next,sendNow) => {
+    value=Math.max(cfg.min,Math.min(cfg.max,Math.round(next)));
+    const f=(value-cfg.min)/Math.max(1,cfg.max-cfg.min);
+    arc.setAttribute("stroke-dashoffset",Math.round(132-f*99));
+    ptr.setAttribute("transform","rotate("+Math.round(-135+f*270)+" 28 28)");
+    out.textContent=cfg.format?cfg.format(value):value; el.setAttribute("aria-valuenow",value);
+    if(sendNow) commit(value);
+  };
+  el.addEventListener("pointerdown",e=>{
+    el.setPointerCapture(e.pointerId); const y=e.clientY,start=value,scale=(cfg.max-cfg.min)/127;
+    const move=ev=>set(start+(y-ev.clientY)*scale*.8,false);
+    el.addEventListener("pointermove",move);
+    el.addEventListener("pointerup",()=>{el.removeEventListener("pointermove",move);commit(value);},{once:true});
+  });
+  el.addEventListener("keydown",e=>{
+    const step=e.shiftKey?Math.max(1,Math.round((cfg.max-cfg.min)/12)):Math.max(1,Math.round((cfg.max-cfg.min)/127));
+    if(e.key==="ArrowUp"||e.key==="ArrowRight"){set(value+step,true);e.preventDefault();}
+    if(e.key==="ArrowDown"||e.key==="ArrowLeft"){set(value-step,true);e.preventDefault();}
+  });
+  set(value,false); host.appendChild(el);
+}
+function paramsFor(type){
+  if(type.family==="hall") return HALL_PARAMS;
+  if(type.family==="echo") return ECHO_PARAMS;
+  if(type.family==="delay") return DELAY_PARAMS;
+  if(type.family==="tempo") return TEMPO_PARAMS;
+  if(type.family==="chorus") return CHORUS_PARAMS;
+  return GENERIC_PARAMS;
+}
+function buildSysFx(host,block,type){
+  host.innerHTML="";
+  paramsFor(type).forEach(cfg=>syxKnob(host,cfg,value=>
+    motifParam([fxBaseAddress(),block,cfg.no*2],split14(value),type.name+" · "+cfg.label)));
+  const extras = block===1
+    ? [{label:"Hall Return",offset:0x22,min:0,max:127,value:96},{label:"Hall Pan",offset:0x23,min:1,max:127,value:64,format:v=>String(v-64)}]
+    : [{label:"Effekt Return",offset:0x22,min:0,max:127,value:96},{label:"Effekt Pan",offset:0x23,min:1,max:127,value:64,format:v=>String(v-64)},
+       {label:"Zum Hall",offset:0x24,min:0,max:127,value:0}];
+  extras.forEach(cfg=>syxKnob(host,cfg,value=>motifParam([fxBaseAddress(),block,cfg.offset],[value],cfg.label)));
+}
+function fillEffectSelect(select,types,initial){
+  types.forEach((type,i)=>select.add(new Option(type.name,i)));
+  select.value=String(initial); buildSysFx(select.id==="revtype"?$("#revparams"):$("#choparams"),select.id==="revtype"?1:2,types[initial]);
+  select.onchange=()=>{
+    const type=types[Number(select.value)],block=select.id==="revtype"?1:2;
+    motifParam([fxBaseAddress(),block,0],[type.msb,type.lsb],type.name);
+    buildSysFx(block===1?$("#revparams"):$("#choparams"),block,type);
+  };
+}
+fillEffectSelect($("#revtype"),REV_TYPES,1);
+fillEffectSelect($("#chotype"),CHO_TYPES,12);
+$("#revapply").onclick=()=>$("#revtype").dispatchEvent(new Event("change"));
+$("#choapply").onclick=()=>$("#chotype").dispatchEvent(new Event("change"));
+
+const fxsection=$("#fxsection"), fxtoggle=$("#fxtoggle");
+function setFxAll(on){
+  fxsection.classList.toggle("fx-all",on); fxtoggle.setAttribute("aria-pressed",String(on));
+  fxtoggle.textContent=on?"Zurück":"Alle Effekte";
+  if(on && typeof setVoiceAll === "function") setVoiceAll(false);
+}
+fxtoggle.onclick=()=>setFxAll(!fxsection.classList.contains("fx-all"));
+addEventListener("keydown",e=>{if(e.key==="Escape"&&fxsection.classList.contains("fx-all"))setFxAll(false);});
+
+const env = $("#env"), envfill = $("#envfill");
+function drawEnv(){
+  if(!KN.attack) return;
+  const a = KN.attack.get(), d = KN.decay.get(), s = KN.sustain.get(), r = KN.release.get();
+  const ax = Math.round(12 + a / 127 * 118), dx = Math.round(12 + a / 127 * 118 + d / 127 * 108),
+        sy = Math.round(86 - s / 127 * 74), rx = Math.round(408 - (127 - r) / 127 * 70);
+  const p = "12,86 " + ax + ",10 " + dx + "," + sy + " " + rx + "," + sy + " 408,86";
+  env.setAttribute("points", p); envfill.setAttribute("points", p);
+}
+drawEnv();
+
+const pad = $("#pad"), dot = $("#dot"), padout = $("#padout");
+function padPos(cut, res){
+  dot.style.left = (cut / 127 * 100) + "%"; dot.style.top = ((1 - res / 127) * 100) + "%";
+  padout.textContent = "cutoff " + cut + " · resonanz " + res;
+  pad.setAttribute("aria-valuetext", "Cutoff " + cut + ", Resonanz " + res);
+}
+function padMove(e){
+  const b = pad.getBoundingClientRect();
+  const cut = Math.round(Math.min(Math.max(e.clientX - b.left, 0), b.width) / b.width * 127);
+  const res = Math.round((1 - Math.min(Math.max(e.clientY - b.top, 0), b.height) / b.height) * 127);
+  padPos(cut, res); KN.cut.set(cut, true); KN.res.set(res, true);
+  return [cut, res];
+}
+pad.addEventListener("pointerdown", e => { pad.setPointerCapture(e.pointerId); padMove(e); });
+pad.addEventListener("pointermove", e => { if(pad.hasPointerCapture(e.pointerId)) padMove(e); });
+pad.addEventListener("pointerup", e => { const [c, r] = padMove(e); send("cc", 74, c); setTimeout(() => send("cc", 71, r), 15); });
+
+let aiTimer;
+function remote(msg){
+  (KNBYCC[msg.number] || []).forEach(k => {
+    k.set(msg.value, true); k.el.classList.add("hit");
+    setTimeout(() => k.el.classList.remove("hit"), 700);
+  });
+  if(msg.number === 74 || msg.number === 71) padPos(KN.cut.get(), KN.res.get());
+  const r = rows[(msg.channel || 1) - 1];
+  if(r){
+    if(msg.number === 7) r.vol.value = msg.value;
+    if(msg.number === 10) r.pan.value = msg.value;
+    if(msg.number === 91) r.rev.value = msg.value;
+  }
+  if(!msg.quiet) line("cc " + msg.number + " → " + msg.value + "  ch" + (msg.channel || 1), true);
+  aitag.textContent = "IN: aktiv"; clearTimeout(aiTimer);
+  aiTimer = setTimeout(() => aitag.textContent = "IN: still", 2500);
+}
+
+$("#panic").onclick = () => { for(let c = 1; c <= 16; c++) send("cc", 123, 0, c); };
+let LIST = VOICES.slice(), filtered = [];
+const vlist = $("#vlist"), vsearch = $("#vsearch");
+
+const enc = document.createElement("div");
+enc.className = "knob"; enc.tabIndex = 0; enc.setAttribute("role","slider"); enc.setAttribute("aria-label","Voice blättern");
+enc.innerHTML = '<svg width="50" height="50" viewBox="0 0 56 56" aria-hidden="true">'
+  + '<circle cx="28" cy="28" r="21" fill="none" stroke="#25303f" stroke-width="5"></circle>'
+  + '<circle class="arc" cx="28" cy="28" r="21" fill="none" stroke="#3d9bf5" stroke-width="5" stroke-linecap="round" transform="rotate(135 28 28)" stroke-dasharray="132" stroke-dashoffset="132"></circle>'
+  + '<line class="ptr" x1="28" y1="28" x2="28" y2="11" stroke="#3d9bf5" stroke-width="2.5" stroke-linecap="round"></line>'
+  + '</svg><label>blättern</label><output>1</output>';
+$("#enc").appendChild(enc);
+
+function paintEnc(){
+  const name = rows[CH-1].sel.value, program = LIST.indexOf(name) + 1;
+  const f = program > 0 ? (program - 1) / Math.max(1, LIST.length - 1) : 0;
+  enc.querySelector(".arc").setAttribute("stroke-dashoffset", Math.round(132 - f * 99));
+  enc.querySelector(".ptr").setAttribute("transform", "rotate(" + Math.round(-135 + f * 270) + " 28 28)");
+  const bank = BANKS[BANKI].name.split(" · ")[0];
+  enc.querySelector("output").textContent = program > 0 ? bank + " · " + program + "/" + LIST.length : "–";
+  enc.setAttribute("aria-valuetext", program > 0 ? bank + " Nummer " + program + ", " + name : "nicht in Auswahl");
+}
+
+function voiceEntry(name){
+  const program = LIST.indexOf(name) + 1;
+  return {name, bankIndex:BANKI, program};
+}
+function isCurrentVoice(item){
+  return item.bankIndex === BANKI && item.name === rows[CH-1].sel.value;
+}
+function pickVoice(item, quiet){
+  if(typeof item === "string") item = voiceEntry(item);
+  if(item.bankIndex !== BANKI) setBank(item.bankIndex, true);
+  const row = rows[CH-1];
+  if(![...row.sel.options].some(o => o.value === item.name)) row.sel.add(new Option(item.name, item.name));
+  row.sel.value = item.name;
+  $("#vsel").textContent = "Part " + CH + " · " + item.name;
+  $("#elemnote").textContent = "Part " + CH + " · " + item.name;
+  vlist.querySelectorAll("button").forEach(b =>
+    b.setAttribute("aria-current", Number(b.dataset.bank) === item.bankIndex && Number(b.dataset.program) === item.program));
+  paintEnc();
+  if(!quiet) send("program", item.program, item.name);
+}
+
+function renderList(){
+  const q = vsearch.value.trim().toLowerCase().replace(/\.+$/, "");
+  filtered = [];
+  BANKS.forEach((bank, bankIndex) => {
+    if(!q && bankIndex !== BANKI) return;
+    bank.voices.forEach((name, i) => {
+      if(!q || name.toLowerCase().includes(q)) filtered.push({name,bankIndex,program:i+1});
+    });
+  });
+  vlist.innerHTML = "";
+  if(!filtered.length){ vlist.innerHTML = "<p>nichts gefunden</p>"; paintEnc(); return; }
+  filtered.forEach(item => {
+    const b = document.createElement("button");
+    b.type = "button"; b.dataset.bank = item.bankIndex; b.dataset.program = item.program;
+    const name = document.createElement("span"); name.className = "voice-name"; name.textContent = item.name;
+    const where = document.createElement("span"); where.className = "voice-bank";
+    where.textContent = BANKS[item.bankIndex].name + " · Nr. " + item.program;
+    b.append(name,where);
+    b.setAttribute("aria-current", isCurrentVoice(item));
+    b.onclick = () => pickVoice(item);
+    vlist.appendChild(b);
+  });
+  paintEnc();
+}
+window.refreshVoice = () => { $("#vsel").textContent = "Part " + CH + " · " + rows[CH-1].sel.value; renderList(); };
+vsearch.oninput = renderList;
+
+function step(d){
+  if(!filtered.length) return;
+  let i = filtered.findIndex(isCurrentVoice);
+  if(i < 0) i = d > 0 ? -1 : filtered.length;
+  i = Math.min(filtered.length - 1, Math.max(0, i + d));
+  pickVoice(filtered[i]);
+  vlist.children[i] && vlist.children[i].scrollIntoView({block:"nearest"});
+}
+enc.addEventListener("pointerdown", e => {
+  enc.setPointerCapture(e.pointerId); let y = e.clientY;
+  const mv = ev => { if(Math.abs(ev.clientY - y) >= 12){ step(ev.clientY < y ? 1 : -1); y = ev.clientY; } };
+  enc.addEventListener("pointermove", mv);
+  enc.addEventListener("pointerup", () => enc.removeEventListener("pointermove", mv), {once:true});
+});
+enc.addEventListener("keydown", e => {
+  if(e.key === "ArrowUp"){ step(-1); e.preventDefault(); }
+  if(e.key === "ArrowDown"){ step(1); e.preventDefault(); }
+});
+renderList(); pickVoice(rows[0].sel.value, true);
+
+const voicesection=$("#voicesection"), voicetoggle=$("#voicetoggle");
+function setVoiceAll(on){
+  voicesection.classList.toggle("voice-all",on); voicetoggle.setAttribute("aria-pressed",String(on));
+  voicetoggle.textContent=on?"Zurück":"Voices groß";
+  if(on){ setFxAll(false); setTimeout(()=>vsearch.focus(),0); }
+}
+voicetoggle.onclick=()=>setVoiceAll(!voicesection.classList.contains("voice-all"));
+addEventListener("keydown",e=>{if(e.key==="Escape"&&voicesection.classList.contains("voice-all"))setVoiceAll(false);});
+
+const NAMES = ["C","C#","D","D#","E","F","F#","G","G#","A","A#","B"], WHITE = [0,2,4,5,7,9,11];
+let base = 48;
+const keys = $("#keys"), knote = $("#knote");
+function buildKeys(){
+  keys.innerHTML = "";
+  const w = 100 / 14;
+  for(let o = 0; o < 2; o++) WHITE.forEach((semi, k) => {
+    const idx = o * 7 + k, note = base + o * 12 + semi;
+    const b = document.createElement("button");
+    b.className = "wk"; b.style.left = (idx * w) + "%"; b.style.width = w + "%";
+    b.dataset.note = note; b.setAttribute("aria-label", NAMES[semi] + (Math.floor(note/12) - 1));
+    keys.appendChild(b);
+    if([0,2,5,7,9].includes(semi)){
+      const s = document.createElement("button");
+      s.className = "bk"; s.style.left = "calc(" + ((idx + 1) * w) + "% - " + (w * 0.3) + "%)"; s.style.width = (w * 0.6) + "%";
+      s.dataset.note = note + 1; s.setAttribute("aria-label", NAMES[semi] + "# " + (Math.floor((note+1)/12) - 1));
+      keys.appendChild(s);
+    }
+  });
+  $("#octlabel").textContent = NAMES[base % 12] + (Math.floor(base / 12) - 1);
+}
+function noteName(n){ return NAMES[n % 12] + (Math.floor(n / 12) - 1); }
+function down(el){
+  if(!el || el.dataset.down === "true") return;
+  el.dataset.down = "true";
+  const n = Number(el.dataset.note);
+  knote.textContent = noteName(n) + " · " + n;
+  send("note_on", n, Number($("#vel").value));
+}
+function up(el){
+  if(!el || el.dataset.down !== "true") return;
+  el.dataset.down = "false";
+  send("note_off", Number(el.dataset.note), 0);
+}
+keys.addEventListener("pointerdown", e => { const t = e.target.closest("button"); if(t){ keys.setPointerCapture(e.pointerId); down(t); } });
+keys.addEventListener("pointermove", e => {
+  if(!keys.hasPointerCapture(e.pointerId)) return;
+  const t = document.elementFromPoint(e.clientX, e.clientY);
+  keys.querySelectorAll('[data-down=true]').forEach(k => { if(k !== t) up(k); });
+  if(t && t.dataset && t.dataset.note) down(t);
+});
+keys.addEventListener("pointerup", () => keys.querySelectorAll('[data-down=true]').forEach(up));
+keys.addEventListener("pointercancel", () => keys.querySelectorAll('[data-down=true]').forEach(up));
+document.getElementById("oct-").onclick = () => { base = Math.max(12, base - 12); buildKeys(); };
+document.getElementById("oct+").onclick = () => { base = Math.min(96, base + 12); buildKeys(); };
+$("#kbtoggle").onclick = () => {
+  const on = $("#kbtoggle").getAttribute("aria-pressed") === "true";
+  $("#kbtoggle").setAttribute("aria-pressed", !on);
+  $("#keybar").hidden = on;
+};
+buildKeys();
+
+const KEYMAP = "awsedftgyhujk";
+addEventListener("keydown", e => {
+  if(e.repeat || e.target.tagName === "INPUT" || e.target.tagName === "SELECT") return;
+  const i = KEYMAP.indexOf(e.key.toLowerCase());
+  if(i >= 0) down(keys.querySelector('[data-note="' + (base + i) + '"]'));
+});
+addEventListener("keyup", e => {
+  const i = KEYMAP.indexOf(e.key.toLowerCase());
+  if(i >= 0) up(keys.querySelector('[data-note="' + (base + i) + '"]'));
+});
+
+
+/* ============ Web MIDI ============ */
+let MIDI = null, OUT = null, IN = null;
+const outsel = $("#outsel"), insel = $("#insel");
+const rackesc = $("#rackesc"), rackmode = $("#rackmode");
+rackmode.value = RACK_MODE;
+function applyRackMode(){
+  document.body.dataset.rackMode = RACK_MODE;
+  if(RACK_MODE === "voice"){
+    select(0);
+    $("#mixmode").textContent = "VOICE · 1 Kanal";
+    $("#fxmixlabel").textContent = "Voice-Regler";
+    $("#chan").textContent = "VOICE · Kanal 1";
+    $("#elemnote").textContent = "VOICE · " + rows[0].sel.value;
+  }else{
+    $("#mixmode").textContent = "Mixer · 16 Parts";
+    $("#fxmixlabel").textContent = "Part und Mix";
+    $("#chan").textContent = "Part " + CH + " · Kanal " + CH;
+  }
+}
+rackmode.onchange = () => {
+  RACK_MODE = rackmode.value;
+  applyRackMode();
+  line("Effektadressen für Rack-Modus " + RACK_MODE.toUpperCase());
+};
+applyRackMode();
+rackesc.onclick = () => {
+  stop(true);
+  line("MIDI-Wiedergabe und alle Noten gestoppt");
+};
+
+function fillPorts(){
+  if(!MIDI) return;
+  const keepO = outsel.value, keepI = insel.value;
+  outsel.innerHTML = '<option value="">\u2014</option>';
+  insel.innerHTML  = '<option value="">\u2014</option>';
+  [...MIDI.outputs.values()].forEach(p => outsel.add(new Option(p.name, p.id)));
+  [...MIDI.inputs.values()].forEach(p => insel.add(new Option(p.name, p.id)));
+  const gO = [...MIDI.outputs.values()].find(p => /motif|yamaha/i.test(p.name));
+  const gI = [...MIDI.inputs.values()].find(p => /motif|yamaha/i.test(p.name));
+  outsel.value = [...MIDI.outputs.keys()].includes(keepO) ? keepO : (gO ? gO.id : "");
+  insel.value  = [...MIDI.inputs.keys()].includes(keepI)  ? keepI  : (gI ? gI.id : "");
+  useOut(); useIn();
+}
+function useOut(){
+  OUT = MIDI ? MIDI.outputs.get(outsel.value) || null : null;
+  state.textContent = OUT ? "verbunden \u00b7 " + OUT.name : "kein Ausgang gew\u00e4hlt";
+}
+function useIn(){
+  if(IN) IN.onmidimessage = null;
+  IN = MIDI ? MIDI.inputs.get(insel.value) || null : null;
+  if(IN) IN.onmidimessage = midiIn;
+}
+outsel.onchange = useOut; insel.onchange = useIn;
+
+if(navigator.requestMIDIAccess){
+  navigator.requestMIDIAccess({sysex:true}).then(a => {
+    MIDI = a; a.onstatechange = fillPorts; fillPorts(); line("Web MIDI bereit");
+  }, () => state.textContent = "Zugriff auf MIDI abgelehnt");
+}else{
+  state.textContent = "Browser ohne Web MIDI \u2013 Chrome oder Edge n\u00f6tig";
+}
+
+/* ============ senden ============ */
+const BANK = {msb:63, lsb:0};   // Motif ES: PRE1 = MSB 63 / LSB 0
+
+function raw(bytes, when, noRec){
+  if(REC.on && !noRec && bytes[0] < 0xF0)
+    REC.ev.push({t:(when || performance.now()) - REC.t0, b:Array.from(bytes)});
+  if(!OUT) return;
+  try{ OUT.send(bytes, when); }catch(err){ line("Fehler: " + err.message); }
+}
+function send(kind, num, val, ch){
+  const c = ((RACK_MODE === "voice" ? 1 : (ch || CH)) - 1) & 15;
+  const v = Math.max(0, Math.min(127, Math.round(Number(val) || 0)));
+  line(kind + " " + num + " \u2192 " + val + "  ch" + (c + 1));
+  if(kind === "cc") raw([0xB0 | c, num & 127, v]);
+  else if(kind === "note_on") raw([0x90 | c, num & 127, v || 1]);
+  else if(kind === "note_off") raw([0x80 | c, num & 127, 0]);
+  else if(kind === "program"){
+    raw([0xB0 | c, 0, BANK.msb]); raw([0xB0 | c, 32, BANK.lsb]);
+    raw([0xC0 | c, Math.max(0, num - 1) & 127]);
+  }
+}
+function allOff(){ for(let c = 0; c < 16; c++) raw([0xB0 | c, 123, 0], undefined, true); }
+$("#panic").onclick = allOff;
+
+/* ============ MIDI IN ============ */
+function midiIn(e){
+  const b = e.data;
+  if(b[0] >= 0xF8) return;
+  if(b[0] === 0xF0) return;
+  if(REC.on && b[0] < 0xF0) REC.ev.push({t:performance.now() - REC.t0, b:Array.from(b)});
+  const st = b[0] & 0xF0, ch = (b[0] & 15) + 1;
+  if(st === 0xB0) remote({number:b[1], value:b[2], channel:ch});
+  else if(st === 0x90 && b[2]) line("note on  " + noteName(b[1]) + " ch" + ch, true);
+  else if(st === 0x80 || st === 0x90) line("note off " + noteName(b[1]) + " ch" + ch, true);
+  else if(st === 0xC0) line("program " + (b[1] + 1) + " ch" + ch, true);
+  if(st !== 0xB0){
+    aitag.textContent = "IN: aktiv"; clearTimeout(inTimer);
+    inTimer = setTimeout(() => aitag.textContent = "IN: still", 2500);
+  }
+}
+let inTimer;
+
+/* ============ Standard-MIDI-File lesen ============ */
+function parseSMF(buf){
+  const d = new DataView(buf); let p = 0;
+  const tag = () => String.fromCharCode(d.getUint8(p++), d.getUint8(p++), d.getUint8(p++), d.getUint8(p++));
+  const vlq = () => { let v = 0, c; do{ c = d.getUint8(p++); v = (v << 7) | (c & 127); }while(c & 128); return v; };
+  if(tag() !== "MThd") throw new Error("keine Standard-MIDI-Datei");
+  const hlen = d.getUint32(p); p += 4;
+  const ntrk = d.getUint16(p + 2); let div = d.getUint16(p + 4); p += hlen;
+  if(div & 0x8000) div = 480;                       // SMPTE: Notbehelf
+  const evs = [], tempos = [{tick:0, us:500000}];
+  for(let t = 0; t < ntrk && p + 8 <= d.byteLength; t++){
+    if(tag() !== "MTrk") break;
+    const end = p + 4 + d.getUint32(p); p += 4;
+    let tick = 0, run = 0;
+    while(p < end){
+      tick += vlq();
+      let st = d.getUint8(p);
+      if(st & 128){ p++; run = st; } else st = run;
+      if(st === 0xFF){
+        const type = d.getUint8(p++), len = vlq();
+        if(type === 0x51 && len === 3)
+          tempos.push({tick, us:(d.getUint8(p) << 16) | (d.getUint8(p+1) << 8) | d.getUint8(p+2)});
+        p += len;
+      }else if(st === 0xF0 || st === 0xF7){
+        p += vlq();
+      }else{
+        const hi = st & 0xF0, n = (hi === 0xC0 || hi === 0xD0) ? 1 : 2;
+        const b = [st]; for(let i = 0; i < n; i++) b.push(d.getUint8(p++));
+        if(hi === 0x90 && b[2] === 0) b[0] = 0x80 | (st & 15);
+        if(hi >= 0x80) evs.push({tick, b});
+      }
+    }
+    p = end;
+  }
+  tempos.sort((a, b) => a.tick - b.tick);
+  const anch = [{tick:0, ms:0, us:tempos[0].us}];
+  let ms = 0, prev = 0, us = tempos[0].us;
+  for(let i = 1; i < tempos.length; i++){
+    ms += (tempos[i].tick - prev) * us / 1000 / div;
+    prev = tempos[i].tick; us = tempos[i].us;
+    anch.push({tick:prev, ms, us});
+  }
+  const toMs = tick => {
+    let a = anch[0];
+    for(const x of anch){ if(x.tick <= tick) a = x; else break; }
+    return a.ms + (tick - a.tick) * a.us / 1000 / div;
+  };
+  evs.sort((a, b) => a.tick - b.tick);
+  return evs.map(e => ({t:toMs(e.tick), b:e.b}));
+}
+
+/* ============ Transport ============ */
+let SONG = null, LOOP = false;
+const PLAY = {on:false, t0:0, pos:0, i:0, timer:null};
+const REC  = {on:false, t0:0, ev:[]};
+const fill = $("#tfill"), ttime = $("#ttime"), tbar = $("#tbar"), sname = $("#songname");
+
+const mmss = ms => { const s2 = Math.max(0, Math.floor(ms / 1000)); return Math.floor(s2 / 60) + ":" + String(s2 % 60).padStart(2, "0"); };
+function paintPos(){
+  const len = SONG ? SONG.len : 0, f = len ? Math.min(1, PLAY.pos / len) : 0;
+  fill.style.width = (f * 100) + "%";
+  ttime.textContent = mmss(PLAY.pos) + " / " + mmss(len);
+  tbar.setAttribute("aria-valuenow", Math.round(f * 100));
+}
+function loadSong(name, ev){
+  ev = ev.filter(e => e.b[0] >= 0x80 && e.b[0] < 0xF0).sort((a, b) => a.t - b.t);
+  if(!ev.length){ sname.textContent = "Song ohne Noten"; return; }
+  SONG = {name, ev, len:ev[ev.length - 1].t + 600};
+  sname.textContent = name;
+  PLAY.pos = 0; paintPos();
+  line("Song geladen: " + name + " \u00b7 " + ev.length + " Events \u00b7 " + mmss(SONG.len));
+}
+function play(){
+  if(!SONG || PLAY.on) return;
+  if(!OUT) line("kein MIDI-Ausgang \u2013 nichts zu h\u00f6ren");
+  if(PLAY.pos >= SONG.len) PLAY.pos = 0;
+  PLAY.on = true; PLAY.t0 = performance.now() - PLAY.pos;
+  PLAY.i = SONG.ev.findIndex(e => e.t >= PLAY.pos);
+  if(PLAY.i < 0) PLAY.i = SONG.ev.length;
+  PLAY.timer = setInterval(pump, 25); pump();
+}
+function pump(){
+  const now = performance.now(), horizon = now - PLAY.t0 + 150;
+  while(PLAY.i < SONG.ev.length && SONG.ev[PLAY.i].t <= horizon){
+    const e = SONG.ev[PLAY.i++];
+    const b = songBytesForRackMode(e.b);
+    if(b) raw(b, PLAY.t0 + e.t, true);
+  }
+  PLAY.pos = now - PLAY.t0; paintPos();
+  if(PLAY.pos >= SONG.len){ if(LOOP){ stop(true); PLAY.pos = 0; play(); } else stop(); }
+}
+function songBytesForRackMode(bytes){
+  if(RACK_MODE !== "voice") return bytes;
+  const b = Array.from(bytes), kind = b[0] & 0xF0;
+  if(kind === 0xC0) return null; // gewählte Voice nicht durch den Song ersetzen
+  if(kind === 0xB0 && [0,7,10,11,32,91,93].includes(b[1])) return null; // Mix-Regler bleiben beim Benutzer
+  if(kind >= 0x80 && kind <= 0xE0) b[0] = kind; // alle Songspuren auf Kanal 1
+  return b;
+}
+function stop(quiet){
+  clearInterval(PLAY.timer); PLAY.on = false;
+  if(OUT && OUT.clear) OUT.clear();
+  allOff(); paintPos();
+  if(!quiet) line("stop bei " + mmss(PLAY.pos));
+}
+function seek(ms){
+  const was = PLAY.on;
+  if(was) stop(true);
+  PLAY.pos = Math.max(0, Math.min(SONG ? SONG.len : 0, ms));
+  paintPos();
+  if(was) play();
+}
+$("#tplay").onclick = play;
+$("#tstop").onclick = () => stop();
+$("#tback").onclick = () => seek(0);
+$("#tloop").onclick = () => { LOOP = !LOOP; $("#tloop").setAttribute("aria-pressed", LOOP); };
+tbar.onclick = e => { const b = tbar.getBoundingClientRect(); seek((e.clientX - b.left) / b.width * (SONG ? SONG.len : 0)); };
+tbar.onkeydown = e => {
+  if(e.key === "ArrowRight"){ seek(PLAY.pos + 2000); e.preventDefault(); }
+  if(e.key === "ArrowLeft"){ seek(PLAY.pos - 2000); e.preventDefault(); }
+};
+$("#tfile").onchange = async e => {
+  const f = e.target.files[0]; if(!f) return;
+  stop(true);
+  try{ loadSong(f.name.replace(/\.midi?$/i, ""), parseSMF(await f.arrayBuffer())); }
+  catch(err){ sname.textContent = "nicht lesbar"; line("Datei nicht lesbar: " + err.message); }
+  e.target.value = "";
+};
+
+/* ============ Aufnahme ============ */
+$("#trec").onclick = () => {
+  const btn = $("#trec");
+  if(!REC.on){
+    REC.ev = []; REC.t0 = performance.now(); REC.on = true;
+    btn.setAttribute("aria-pressed", "true"); btn.textContent = "\u25a0 Aufnahme l\u00e4uft";
+    line("Aufnahme l\u00e4uft \u2013 Tastatur, Regler und MIDI IN werden mitgeschnitten");
+  }else{
+    REC.on = false;
+    btn.setAttribute("aria-pressed", "false"); btn.textContent = "\u25cf Aufnahme";
+    if(REC.ev.length) loadSong("Aufnahme", REC.ev.map(x => ({t:x.t, b:x.b})));
+    else line("Aufnahme leer");
+  }
+};
+
+/* ============ Export ============ */
+$("#texport").onclick = () => {
+  if(!SONG) return line("kein Song zum Speichern");
+  const PPQ = 480, mspt = 500 / PPQ, trk = [];
+  const vlq = n => { const a = [n & 127]; n = Math.floor(n / 128);
+    while(n > 0){ a.unshift((n & 127) | 128); n = Math.floor(n / 128); } return a; };
+  let last = 0;
+  SONG.ev.forEach(e => {
+    const tick = Math.round(e.t / mspt);
+    vlq(Math.max(0, tick - last)).forEach(x => trk.push(x));
+    e.b.forEach(x => trk.push(x));
+    last = tick;
+  });
+  [0, 0xFF, 0x2F, 0].forEach(x => trk.push(x));
+  const L = trk.length, out = [];
+  [0x4D,0x54,0x68,0x64,0,0,0,6,0,0,0,1,(PPQ>>8)&255,PPQ&255,
+   0x4D,0x54,0x72,0x6B,(L>>>24)&255,(L>>>16)&255,(L>>>8)&255,L&255].forEach(x => out.push(x));
+  trk.forEach(x => out.push(x));
+  const url = URL.createObjectURL(new Blob([new Uint8Array(out)], {type:"audio/midi"}));
+  const a = document.createElement("a");
+  a.href = url; a.download = SONG.name.replace(/[^\w\-]+/g, "_") + ".mid";
+  a.click(); URL.revokeObjectURL(url);
+  line("gespeichert: " + a.download);
+};
+
+/* ============ Voice-Liste aus Datei ============ */
+$("#vfile").onchange = async e => {
+  const f = e.target.files[0]; if(!f) return;
+  const names = (await f.text()).split(/\r?\n/).map(x => x.split(/[;,\t]/)[0].trim()).filter(Boolean).slice(0, 128);
+  if(!names.length) return line("Liste leer");
+  const mine = BANKS.find(b => b.name.indexOf("eigene") === 0);
+  if(mine){ mine.voices = names; setBank(BANKS.indexOf(mine)); }
+  else{
+    BANKS.push({name:"eigene Liste", msb:BANK.msb, lsb:BANK.lsb, voices:names});
+    banksel.add(new Option("eigene Liste", BANKS.length - 1));
+    setBank(BANKS.length - 1);
+  }
+  line(names.length + " Namen aus " + f.name);
+  e.target.value = "";
+};
+
+/* ============ Bank-Umschaltung ============ */
+const banksel = $("#banksel");
+BANKS.forEach((b, i) => banksel.add(new Option(b.name, i)));
+
+function setBank(i, quiet){
+  BANKI = Number(i);
+  banksel.value = String(BANKI);
+  const b = BANKS[BANKI];
+  BANK.msb = b.msb; BANK.lsb = b.lsb;
+  LIST = b.voices;
+  rows.forEach(r => {
+    const keep = r.sel.value;
+    r.sel.innerHTML = b.voices.map(n => "<option>" + n + "</option>").join("");
+    r.sel.value = b.voices.includes(keep) ? keep : b.voices[Math.min(r.ch - 1, b.voices.length - 1)];
+  });
+  $("#vnote").textContent = b.voices.length + " Voices · Bank " + b.msb + "/" + b.lsb;
+  renderList(); refreshVoice();
+  if(!quiet) line("Bank " + b.name);
+}
+banksel.onchange = () => {
+  vsearch.value = "";
+  setBank(banksel.value);
+};
+setBank(0, true);
+
+/* ============ CC-Zuordnung ============ */
+/* fest empfangen laut Implementation Chart des Rack ES */
+const NATIVE = [1, 6, 7, 10, 11, 38, 64, 65, 66, 71, 72, 73, 74, 75, 91, 93, 96, 97, 100, 101];
+const cctab = $("#cctab");
+
+function ccBadge(el, cc){
+  const n = Number(cc);
+  const ok = NATIVE.indexOf(n) >= 0;
+  el.className = "nat" + (ok ? " ok" : "");
+  el.textContent = !n ? "aus" : ok ? "fest" : "CtrlSet";
+  el.title = !n ? "kein Controller zugeordnet"
+    : ok ? "empfängt das Rack ES ohne weitere Einstellung"
+         : "im Motif zuweisen: Voice Edit → CtrlSet";
+}
+function buildCC(){
+  cctab.innerHTML = "";
+  CCREG.forEach(r => {
+    const row = document.createElement("div"); row.className = "ccrow";
+    const lab = document.createElement("span"); lab.textContent = r.label;
+    const inp = document.createElement("input");
+    inp.type = "number"; inp.min = 0; inp.max = 127; inp.value = r.get();
+    inp.setAttribute("aria-label", "Controller-Nummer für " + r.label);
+    const bad = document.createElement("span"); ccBadge(bad, r.get());
+    inp.onchange = () => {
+      const n = Math.max(0, Math.min(127, Math.round(Number(inp.value) || 0)));
+      inp.value = n; r.set(n); ccBadge(bad, n);
+      line(r.label + " → " + (n ? "cc" + n : "aus"));
+    };
+    row.appendChild(lab); row.appendChild(inp); row.appendChild(bad);
+    cctab.appendChild(row);
+  });
+  $("#ccnote").textContent = CCREG.length + " Regler · 0 = aus";
+}
+buildCC();
+
+$("#ccsave").onclick = () => {
+  const map = {};
+  CCREG.forEach(r => map[r.label] = r.get());
+  const url = URL.createObjectURL(new Blob([JSON.stringify(map, null, 1)], {type:"application/json"}));
+  const a = document.createElement("a");
+  a.href = url; a.download = "beyhl_cc_mapping.json"; a.click();
+  URL.revokeObjectURL(url);
+  line("Mapping gespeichert");
+};
+$("#ccfile").onchange = async e => {
+  const f = e.target.files[0]; if(!f) return;
+  try{
+    const map = JSON.parse(await f.text());
+    let n = 0;
+    CCREG.forEach(r => { if(map[r.label] !== undefined){ r.set(Number(map[r.label]) || 0); n++; } });
+    buildCC(); line(n + " Zuordnungen aus " + f.name);
+  }catch(err){ line("Mapping nicht lesbar: " + err.message); }
+  e.target.value = "";
+};
+paintPos();
+
+line("bereit · V8 · DEV 1 fest · VOICE einkanalig, MULTI mit 16 Parts");
+</script>
+</body>
+</html>
