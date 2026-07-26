@@ -2,6 +2,8 @@
 
 Free control software for the Yamaha Motif Rack ES, running directly in the browser via the Web MIDI interface.
 
+![Beyhl Synth V12 interface](Beyhl_Synth_V12.png)
+
 ## Start
 
 Open the current test version [`beyhl_synth_V12.html`](beyhl_synth_V12.html) in Chrome and allow MIDI access, then connect the Motif Rack ES via USB.
