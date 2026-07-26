@@ -2,13 +2,25 @@
 
 Free control software for the Yamaha Motif Rack ES, running directly in the browser via the Web MIDI interface.
 
-![Beyhl Synth V12 interface](Beyhl_Synth_V12.png)
+## Version 17 — with PLG1 Extension
+
+![Beyhl Synth V17 with PLG1 Extension](Beyhl_Synth_V17_PLG1_Extension.png)
 
 ## Start
 
-Open the current test version [`beyhl_synth_V12.html`](beyhl_synth_V12.html) in Chrome and allow MIDI access, then connect the Motif Rack ES via USB.
+Open the current test version [`beyhl_synth_V17.html`](beyhl_synth_V17.html) in Chrome and allow MIDI access, then connect the Motif Rack ES via USB.
 
-Version 12 uses the Yamaha-documented Multi Part parameter-change addresses to assign a separate bank, voice, receive channel, volume, pan, and reverb level to each of the 16 parts. Mute turns the selected part's receive channel off; Solo temporarily turns all other parts' receive channels off. Instrument search works across all included banks and assigns the result only to the currently selected part. Complete setups can be saved under freely chosen names and loaded again through the browser's file dialogs, starting in the Music folder.
+Version 17 uses the Yamaha-documented Multi Part parameter-change addresses to control the 16 internal parts. It adds the installed PLG1 piano board as a separate Part 00 with its own MIDI channel, voice, volume, pan, reverb, mute, and solo controls. PLG1 starts muted in Multi mode so that it cannot play unnoticed alongside an internal part.
+
+In Voice mode, **INTERN** and **PLG1 PIANO** can be selected directly. Both sources remember their own bank, voice, volume, pan, and reverb settings independently from Multi mode. Instrument search follows the selected sound source. Complete setups can be saved under freely chosen names and loaded again through the browser's file dialogs, starting in the Music folder.
+
+## Interface History
+
+All three project screenshots are retained here:
+
+![Beyhl Synth V12 interface](Beyhl_Synth_V12.png)
+
+![Earlier Motif Synthesizer Control interface](Synthesizer_%20Bedienprogramm.png)
 
 ## Notice
 

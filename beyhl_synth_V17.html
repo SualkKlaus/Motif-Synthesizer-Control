@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Beyhl Synth V12 &middot; Motif Rack ES</title>
+<title>Beyhl Synth V17 &middot; Motif Rack ES</title>
 <style>
 :root{
   --bg:#0b1016; --panel:#141b24; --panel2:#1a2230; --panel3:#212b3a; --line:#25303f;
@@ -49,6 +49,12 @@ section>h2 .note{margin-left:auto;font:400 11px/1 var(--mono);letter-spacing:0;t
 .mixrow b{font:500 11px/1 var(--mono);color:var(--dim)}
 .mixrow[aria-current=true] b{color:var(--part)}
 .mixrow select{font-size:12px;padding:3px 5px;width:100%}
+.mixrow.plg{border-color:#315b52;background:#11231f}
+.mixrow.plg b{color:var(--filter)}
+.mixrow.voice-only{display:none}
+.plgvoicecell{display:flex;gap:5px;min-width:0}
+.plgvoicecell .plgch{flex:0 0 58px;width:58px}
+.plgvoicecell .plgvoice{flex:1;min-width:0}
 input[type=range]{-webkit-appearance:none;appearance:none;width:100%;height:16px;background:transparent;cursor:pointer}
 input[type=range]::-webkit-slider-runnable-track{height:4px;border-radius:2px;background:#0e1620;border:1px solid var(--line)}
 input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:13px;height:13px;margin-top:-6px;border-radius:50%;background:var(--c,var(--part));border:none}
@@ -84,6 +90,10 @@ input[type=search]{width:100%;background:var(--panel2);border:1px solid var(--li
 .vrow{display:flex;gap:6px}
 .vrow select{flex:0 0 46%;font-size:12px}
 .vrow input[type=search]{flex:1;min-width:0}
+.voice-source{display:flex;gap:7px;margin-bottom:7px}
+.voice-source button{flex:1;font:700 11px/1 var(--mono);letter-spacing:.04em}
+.voice-source button[aria-pressed=true]{color:#6fffdc;border-color:#247d68;background:#12332c}
+body[data-rack-mode="multi"] .voice-source{display:none}
 .voicepanel{display:flex;flex-direction:column;min-height:0}
 .vlist{margin-top:7px;max-height:132px;overflow:auto;border:1px solid var(--line);border-radius:7px;background:var(--panel2)}
 .vlist button{display:flex;width:100%;text-align:left;border:none;border-radius:0;background:transparent;padding:5px 8px;font-size:12px;color:var(--mid);gap:10px;align-items:center}
@@ -138,7 +148,8 @@ footer{background:var(--panel);border-top:1px solid var(--line);padding:8px 16px
 #fxsection{order:2;flex:0 0 260px!important}
 #mixsection{flex:0 0 360px!important}
 body[data-rack-mode="voice"] #mixsection{flex-basis:145px!important}
-body[data-rack-mode="voice"] #mix .mixrow:not(:first-child){display:none}
+body[data-rack-mode="voice"] #mix .mixrow{display:none}
+body[data-rack-mode="voice"] #mix .mixrow.voice-active{display:grid}
 #voicesection.voice-all{position:fixed;z-index:31;inset:10px;box-shadow:0 18px 80px #000;border-color:var(--part)}
 #voicesection.voice-all .browser{flex:1;grid-template-columns:110px minmax(0,1fr);align-items:stretch}
 #voicesection.voice-all .vlist{max-height:none;flex:1}
@@ -152,12 +163,22 @@ main>.col:nth-child(2)>section:nth-child(1){order:1}
 main>.col:nth-child(2)>section:nth-child(2){order:3}
 main>.col:nth-child(2)>section:nth-child(3){order:4}
 @media(max-width:600px){#fxsection.fx-all{inset:4px}#fxsection.fx-all .fxgroups{grid-template-columns:1fr}}
+.feature-warning{order:2;border:1px solid #9a3434;background:#30191d;color:#ff8181;border-radius:8px;
+  padding:9px 12px;text-align:center;font:700 13px/1.2 var(--mono);letter-spacing:.08em;text-transform:uppercase}
+.feature-tabs{order:3;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.feature-tabs button{white-space:normal;min-height:42px}
+.feature-tabs button[aria-expanded=true]{color:var(--fg);border-color:var(--part);background:#14263b;box-shadow:inset 0 0 0 1px #285d91}
+.feature-panel{order:4!important;flex:1 1 auto!important;min-height:0}
+.feature-panel[hidden]{display:none!important}
+#fxsection.feature-panel .fxscroll{max-height:none;flex:1;overflow:auto}
+#fxsection.feature-panel{flex-basis:auto!important}
+@media(max-width:700px){.feature-tabs{grid-template-columns:1fr}}
 </style>
 </head>
 <body>
 
 <header>
-  <h1>Beyhl Synth<small>V12 &middot; Motif Rack ES</small></h1>
+  <h1>Beyhl Synth<small>V17 &middot; Motif Rack ES</small></h1>
   <span class="tag live">OUT <select id="outsel" aria-label="MIDI-Ausgang"></select></span>
   <span class="tag">IN <select id="insel" aria-label="MIDI-Eingang"></select></span>
   <span class="tag live" title="Feste Yamaha-MIDI-Gerätenummer; am Rack darf DeviceNo auf all stehen">DEV 1 · fest</span>
@@ -191,7 +212,7 @@ main>.col:nth-child(2)>section:nth-child(3){order:4}
 <main>
   <div class="col">
     <section id="mixsection" style="--accent:var(--part);flex:1">
-      <h2><span id="mixmode">Mixer · 16 Parts</span> <span class="note" id="vnote">Voice-Liste: Platzhalter</span></h2>
+      <h2><span id="mixmode">Mixer · PLG1 + 16 Parts</span> <span class="note" id="vnote">Voice-Liste: Platzhalter</span></h2>
       <div class="body">
         <div class="mixhead"><span>#</span><span>Voice</span><span>Volume</span><span>Pan</span><span>Hall</span><span>M</span><span>S</span></div>
         <div id="mix"></div>
@@ -222,6 +243,10 @@ main>.col:nth-child(2)>section:nth-child(3){order:4}
       <div class="body browser">
         <div id="enc"></div>
         <div class="voicepanel">
+          <div class="voice-source" role="group" aria-label="Klangerzeuger im Voice-Modus">
+            <button type="button" id="voicesrcinternal" aria-pressed="true">INTERN</button>
+            <button type="button" id="voicesrcplg1" aria-pressed="false">PLG1 PIANO</button>
+          </div>
           <div class="vrow">
             <select id="banksel" aria-label="Bank"></select>
             <input type="search" id="vsearch" placeholder="org…" aria-label="Voice suchen" autocomplete="off">
@@ -231,7 +256,14 @@ main>.col:nth-child(2)>section:nth-child(3){order:4}
       </div>
     </section>
 
-    <section style="--accent:var(--filter)">
+    <div class="feature-warning" role="note">MIDI-Steuerzeichen noch nicht hinterlegt</div>
+    <div class="feature-tabs" role="group" aria-label="Bereiche ohne hinterlegte MIDI-Steuerzeichen">
+      <button type="button" data-panel="fxsection" aria-expanded="false">Mix und Effekte</button>
+      <button type="button" data-panel="filtersection" aria-expanded="false">Filter</button>
+      <button type="button" data-panel="egsection" aria-expanded="false">Amplitude EG</button>
+    </div>
+
+    <section id="filtersection" class="feature-panel" style="--accent:var(--filter)" hidden>
       <h2>Filter <span class="note">cc74 / cc71</span></h2>
       <div class="body two">
         <div>
@@ -246,7 +278,7 @@ main>.col:nth-child(2)>section:nth-child(3){order:4}
       </div>
     </section>
 
-    <section style="--accent:var(--env)">
+    <section id="egsection" class="feature-panel" style="--accent:var(--env)" hidden>
       <h2>Amplitude EG</h2>
       <div class="body">
         <svg viewBox="0 0 420 96" style="width:100%;height:96px;background:var(--panel2);border:1px solid var(--line);border-radius:8px" role="img" aria-label="Hüllkurve">
@@ -257,8 +289,8 @@ main>.col:nth-child(2)>section:nth-child(3){order:4}
       </div>
     </section>
 
-    <section id="fxsection" style="--accent:var(--mix);flex:1">
-      <h2>Mix und Effekte <button class="fxview" id="fxtoggle" aria-pressed="false">Alle Effekte</button></h2>
+    <section id="fxsection" class="feature-panel" style="--accent:var(--mix);flex:1" hidden>
+      <h2>Mix und Effekte <button class="fxview" id="fxtoggle" aria-pressed="false" hidden>Alle Effekte</button></h2>
       <div class="body fxscroll" id="fxbody">
         <div class="fxgroups">
           <article class="fxgroup">
@@ -296,7 +328,8 @@ main>.col:nth-child(2)>section:nth-child(3){order:4}
 <script>
 const $ = s => document.querySelector(s);
 const logs = $("#logs"), state = $("#state"), aitag = $("#aitag");
-let CH = 1, RACK_MODE = "voice";
+let CH = 1, RACK_MODE = "voice", VOICE_MUTED = false;
+let VOICE_SOURCE = "internal", SELECTED_PLG = false;
 const DEVICE_NIBBLE = 0; // DEV 1; am MOTIF-RACK ES funktioniert dazu DeviceNo = all.
 
 const DRUM_PRE = ["Hyper Std","DryStandrd","NewRock","RockSt1","RockSt2","RockMono1","RockMono2","Hip Hop1","Hip Hop2","Hip Hop3","Hip Hop4","Hip Hop5","Hip Hop6","HipStick1","HipStick2","HipStick3","HipStick4","T9HipKit1","T9HipKit2","R&B Kit1","R&B Kit2","R&B Kit3","AnalogT9","AnalogT8","Tekno Kit","House Kit1","House Kit2","Big Kit","Break Kit","Drum'nBass","Acid Kit","Jungle Kit","Electric","Human Kit","Hard Kit","Distorted","Ambient","Jazz Kit","Orchestral","Garage","All Round","Rock Multi","Hip Multi","Percussion","Latin Perc","Gtr/Bs Fx","Wacko Kit","Wood Bits","Metal Bits","Hands Kit","Scratches","AcstSnares","StSnares","AllKicks","DanceKick","EasySnares","Cuban","SynPopKit","Arabic Mix","BellyDance","DanceSnare","SpecialSFX","Synthetic","SFX Kit"];
@@ -322,6 +355,14 @@ const BANKS = [
 ]);
 let BANKI = 0;
 const VOICES = BANKS[0].voices;
+const plgNames = prefix => Array.from({length:64},(_,i)=>prefix + " " + String(i+1).padStart(2,"0"));
+/* Yamaha Data List: Plug-in Voice Slot 1 nutzt MSB 63 mit LSB 24/70/71/72. */
+const PLG1_BANKS = [
+  {name:"PLG1 PRE1 · 63/70",msb:63,lsb:70,voices:plgNames("PLG1 Preset 1")},
+  {name:"PLG1 PRE2 · 63/71",msb:63,lsb:71,voices:plgNames("PLG1 Preset 2")},
+  {name:"PLG1 PRE3 · 63/72",msb:63,lsb:72,voices:plgNames("PLG1 Preset 3")},
+  {name:"PLG1 USER · 63/24",msb:63,lsb:24,voices:plgNames("PLG1 User")}
+];
 
 function line(txt, ai){
   const d = document.createElement("div");
@@ -389,6 +430,79 @@ function ccUnindex(cc, api){
 
 const MIXCC = {vol:7, pan:10, rev:91};
 const mix = $("#mix"), rows = [];
+const plgRow = document.createElement("div");
+plgRow.className = "mixrow plg";
+plgRow.innerHTML = '<b title="Plug-in-Part vor den 16 internen Parts">00</b>'
+  + '<span class="plgvoicecell"><select class="plgch" aria-label="MIDI-Kanal PLG1">'
+  + Array.from({length:16},(_,i)=>'<option value="'+(i+1)+'"'+(i===0?' selected':'')+'>CH '+(i+1)+'</option>').join("")
+  + '</select><select class="plgvoice" aria-label="Voice PLG1">'
+  + PLG1_BANKS[0].voices.map((v,i)=>'<option'+(i===0?' selected':'')+'>'+v+'</option>').join("") + '</select></span>'
+  + '<input type="range" min="0" max="127" value="100" style="--c:var(--filter)" aria-label="Volume PLG1">'
+  + '<input type="range" min="0" max="127" value="64" style="--c:var(--mid)" aria-label="Pan PLG1">'
+  + '<input type="range" min="0" max="127" value="40" style="--c:var(--mix)" aria-label="Hall PLG1">'
+  + '<button class="mini" aria-pressed="true" title="PLG1 stummschalten">M</button>'
+  + '<button class="mini solo" aria-pressed="false" title="Nur PLG1 hören">S</button>';
+const [plgVol,plgPan,plgRev] = plgRow.querySelectorAll('input[type="range"]');
+const [plgMute,plgSolo] = plgRow.querySelectorAll("button");
+const plgPart = {row:plgRow,vol:plgVol,pan:plgPan,rev:plgRev,ch:1,pp:0x60,isPlugin:true,
+  chSelect:plgRow.querySelector(".plgch"),sel:plgRow.querySelector(".plgvoice"),
+  bankIndex:0,program:1,name:PLG1_BANKS[0].voices[0],muted:true,soloed:false};
+mix.appendChild(plgRow);
+plgVol.oninput=()=>sendPartMixValue(plgPart,0x0D,MIXCC.vol,Math.round(plgVol.value));
+plgPan.oninput=()=>sendPartMixValue(plgPart,0x0E,MIXCC.pan,Math.max(1,Math.round(plgPan.value)));
+plgRev.oninput=()=>sendPartMixValue(plgPart,0x12,MIXCC.rev,Math.round(plgRev.value));
+plgMute.onclick=e=>{e.stopPropagation();
+  if(RACK_MODE==="voice"){
+    VOICE_MUTED=!VOICE_MUTED; plgMute.setAttribute("aria-pressed",String(VOICE_MUTED)); applyVoiceMute(); return;
+  }
+  plgPart.muted=!plgPart.muted; plgMute.setAttribute("aria-pressed",String(plgPart.muted)); applyPartMuteSolo();
+};
+plgSolo.onclick=e=>{e.stopPropagation(); if(RACK_MODE==="voice")return;
+  plgPart.soloed=!plgPart.soloed; plgSolo.setAttribute("aria-pressed",String(plgPart.soloed)); applyPartMuteSolo();
+  line("solo PLG1"+(plgPart.soloed?" ein":" aus"));
+};
+plgRow.onclick=()=>selectPlugin();
+plgPart.chSelect.onchange=e=>{e.stopPropagation(); plgPart.ch=Number(plgPart.chSelect.value); CH=plgPart.ch;
+  if(RACK_MODE==="multi")applyPartMuteSolo(); updateSelectedLabels();
+  line("PLG1 empfängt auf MIDI-Kanal "+plgPart.ch);
+};
+plgPart.sel.onchange=e=>{e.stopPropagation(); selectPlugin();
+  pickVoice({name:plgPart.sel.value,bankIndex:plgPart.bankIndex,program:plgPart.sel.selectedIndex+1});
+};
+
+function createVoiceOnlyPart(plugin){
+  const banks=plugin?PLG1_BANKS:BANKS, label=plugin?"VP":"VI";
+  const row=document.createElement("div");
+  row.className="mixrow voice-only"+(plugin?" plg":"");
+  row.innerHTML='<b title="Eigener Speicher für den Voice-Modus">'+label+'</b>'
+    +'<select aria-label="'+(plugin?'PLG1 Piano':'Interne Voice')+'">'
+    +banks[0].voices.map((v,i)=>'<option'+(i===0?' selected':'')+'>'+v+'</option>').join("")+'</select>'
+    +'<input type="range" min="0" max="127" value="100" style="--c:'+(plugin?'var(--filter)':'var(--part)')+'" aria-label="Voice Volume">'
+    +'<input type="range" min="0" max="127" value="64" style="--c:var(--mid)" aria-label="Voice Pan">'
+    +'<input type="range" min="0" max="127" value="40" style="--c:var(--mix)" aria-label="Voice Hall">'
+    +'<button class="mini" aria-pressed="false" title="Voice stummschalten">M</button>'
+    +'<button class="mini solo" aria-pressed="false" title="Im Voice-Modus nicht verfügbar">S</button>';
+  const [vol,pan,rev]=row.querySelectorAll('input[type="range"]');
+  const [mute,solo]=row.querySelectorAll("button");
+  const part={row,vol,pan,rev,ch:1,isPlugin:plugin,isVoiceOnly:true,sel:row.querySelector("select"),
+    bankIndex:0,program:1,name:banks[0].voices[0],muted:false,soloed:false};
+  const source=plugin?"plg1":"internal";
+  const activate=()=>setVoiceSource(source,false);
+  vol.oninput=()=>{if(RACK_MODE==="voice"&&currentPart()===part)sendPartMixValue(part,0x0D,MIXCC.vol,Math.round(vol.value));};
+  pan.oninput=()=>{if(RACK_MODE==="voice"&&currentPart()===part)sendPartMixValue(part,0x0E,MIXCC.pan,Math.max(1,Math.round(pan.value)));};
+  rev.oninput=()=>{if(RACK_MODE==="voice"&&currentPart()===part)sendPartMixValue(part,0x12,MIXCC.rev,Math.round(rev.value));};
+  mute.onclick=e=>{e.stopPropagation(); activate(); VOICE_MUTED=!VOICE_MUTED; applyVoiceMute(); paintMuteSoloButtons();};
+  solo.onclick=e=>e.stopPropagation();
+  row.onclick=activate;
+  part.sel.onchange=e=>{e.stopPropagation(); activate();
+    pickVoice({name:part.sel.value,bankIndex:part.bankIndex,program:part.sel.selectedIndex+1});
+  };
+  mix.insertBefore(row,plgRow);
+  return part;
+}
+const voiceInternalPart=createVoiceOnlyPart(false);
+const voicePlgPart=createVoiceOnlyPart(true);
+
 VOICES.slice(0,16).forEach((name, i) => {
   const row = document.createElement("div");
   row.className = "mixrow"; row.setAttribute("aria-current", i === 0);
@@ -409,9 +523,16 @@ VOICES.slice(0,16).forEach((name, i) => {
   pan.oninput = () => sendPartMixValue(part, 0x0E, MIXCC.pan, Math.max(1, Math.round(pan.value)));
   rev.oninput = () => sendPartMixValue(part, 0x12, MIXCC.rev, Math.round(rev.value));
   mute.onclick = e => { e.stopPropagation();
+    if(RACK_MODE === "voice"){
+      VOICE_MUTED = !VOICE_MUTED;
+      mute.setAttribute("aria-pressed", String(VOICE_MUTED));
+      applyVoiceMute();
+      return;
+    }
     part.muted = !part.muted; mute.setAttribute("aria-pressed", String(part.muted));
     applyPartMuteSolo(); };
   solo.onclick = e => { e.stopPropagation();
+    if(RACK_MODE === "voice") return;
     part.soloed = !part.soloed; solo.setAttribute("aria-pressed", String(part.soloed));
     applyPartMuteSolo();
     line("solo part " + ch + (part.soloed ? " ein" : " aus")); };
@@ -421,15 +542,52 @@ VOICES.slice(0,16).forEach((name, i) => {
     pickVoice({name:part.sel.value, bankIndex:part.bankIndex, program:part.sel.selectedIndex+1}); };
 });
 
+function allParts(){ return [plgPart,...rows]; }
+function displayParts(){ return [voiceInternalPart,voicePlgPart,...allParts()]; }
+function banksForPart(part){ return part && part.isPlugin ? PLG1_BANKS : BANKS; }
+function currentPart(){
+  if(RACK_MODE === "voice") return VOICE_SOURCE === "plg1" ? voicePlgPart : voiceInternalPart;
+  return SELECTED_PLG ? plgPart : rows[CH-1];
+}
+function currentBanks(){ return banksForPart(currentPart()); }
+function partLabel(part){
+  if(part.isVoiceOnly)return part.isPlugin?"PLG1 PIANO":"INTERN";
+  return part.isPlugin?"PLG1":"Part "+part.ch;
+}
+
 function partReceiveChannel(part){
-  const anySolo = rows.some(r => r.soloed);
+  const anySolo = allParts().some(r => r.soloed);
   return part.muted || (anySolo && !part.soloed) ? 0x7F : (part.ch - 1) & 0x0F;
 }
 function applyPartMuteSolo(){
   if(RACK_MODE !== "multi") return;
-  rows.forEach(part => sendPartReceiveChannel(part, undefined, true));
-  const solo = rows.filter(part => part.soloed).map(part => part.ch);
-  line(solo.length ? "Solo aktiv: Part " + solo.join(", ") : "Solo aus · Yamaha-Empfangskanäle wiederhergestellt");
+  allOff();
+  const start = performance.now() + 15;
+  allParts().forEach((part,i) => sendPartReceiveChannel(part, start + i * 3, true));
+  const solo = allParts().filter(part => part.soloed).map(part => part.isPlugin ? "PLG1" : "Part "+part.ch);
+  line(solo.length ? "Solo aktiv: " + solo.join(", ") : "Solo aus · Yamaha-Empfangskanäle wiederhergestellt");
+}
+function applyVoiceMute(quiet){
+  if(RACK_MODE !== "voice") return;
+  allOff();
+  motifParam([0x00,0x00,0x0A],[VOICE_MUTED ? 0x7F : 0x00],
+    VOICE_MUTED ? "VOICE Mute · Basic Receive Channel off" : "VOICE an · Basic Receive Channel 1");
+  if(!quiet) line(VOICE_MUTED ? "VOICE stumm" : "VOICE wieder hörbar");
+}
+function paintMuteSoloButtons(){
+  displayParts().forEach(part=>{
+    const [mute,solo]=part.row.querySelectorAll("button");
+    mute.setAttribute("aria-pressed",String(part.muted));
+    solo.setAttribute("aria-pressed",String(part.soloed));
+    solo.disabled=Boolean(part.isVoiceOnly);
+  });
+  displayParts().forEach(part=>part.row.classList.toggle("voice-active",RACK_MODE==="voice" && part===currentPart()));
+  if(RACK_MODE === "voice"){
+    const [mute,solo]=currentPart().row.querySelectorAll("button");
+    mute.setAttribute("aria-pressed",String(VOICE_MUTED));
+    solo.setAttribute("aria-pressed","false");
+    solo.disabled=true;
+  }
 }
 
 CCREG.push({label:"Part Volume", get: () => MIXCC.vol, set: n => MIXCC.vol = n});
@@ -437,12 +595,39 @@ CCREG.push({label:"Part Pan", get: () => MIXCC.pan, set: n => MIXCC.pan = n});
 CCREG.push({label:"Part Hall", get: () => MIXCC.rev, set: n => MIXCC.rev = n});
 
 function select(i){
-  if(RACK_MODE === "voice") i = 0;
+  if(RACK_MODE === "voice"){
+    paintMuteSoloButtons(); updateSelectedLabels();
+    if(window.refreshVoice) window.refreshVoice();
+    return;
+  }
+  SELECTED_PLG = false;
+  plgPart.row.setAttribute("aria-current","false");
   rows.forEach((r, j) => r.row.setAttribute("aria-current", j === i));
   CH = i + 1;
-  $("#chan").textContent = "Part " + CH + " · Kanal " + CH;
-  $("#elemnote").textContent = "Part " + CH + " · " + rows[i].name;
-  if(window.refreshVoice) setBank(rows[i].bankIndex, true);
+  updateSelectedLabels();
+  if(window.refreshVoice) window.refreshVoice();
+}
+function selectPlugin(){
+  if(RACK_MODE === "voice"){
+    setVoiceSource("plg1",false); return;
+  }
+  SELECTED_PLG = true; CH = plgPart.ch;
+  rows.forEach(r=>r.row.setAttribute("aria-current","false"));
+  plgPart.row.setAttribute("aria-current","true");
+  updateSelectedLabels();
+  if(window.refreshVoice) window.refreshVoice();
+}
+function updateSelectedLabels(){
+  const part=currentPart();
+  if(RACK_MODE==="voice"){
+    const source=VOICE_SOURCE==="plg1"?"PLG1 PIANO":"INTERN";
+    $("#chan").textContent="VOICE · "+source;
+    $("#elemnote").textContent=source+" · "+part.name;
+  }else{
+    const label=part.isPlugin?"PLG1 · Kanal "+part.ch:"Part "+part.ch+" · Kanal "+part.ch;
+    $("#chan").textContent=label;
+    $("#elemnote").textContent=(part.isPlugin?"PLG1":"Part "+part.ch)+" · "+part.name;
+  }
 }
 
 const elems = $("#elems");
@@ -577,7 +762,7 @@ const GENERIC_PARAMS = Array.from({length:10},(_,i)=>({no:i+1,label:"Parameter "
 function split14(value){ const n = Math.max(0,Math.min(16383,Math.round(value))); return [(n>>7)&127,n&127]; }
 function fxBaseAddress(){
   if(RACK_MODE === "multi") return 0x36;
-  const bank = BANKS[BANKI];
+  const bank = currentBanks()[BANKI];
   return bank && (bank.msb === 127 || (bank.msb === 63 && (bank.lsb === 32 || bank.lsb === 40))) ? 0x46 : 0x40;
 }
 function motifParam(address, data, label){
@@ -585,9 +770,9 @@ function motifParam(address, data, label){
   line((label || "Rack-Parameter") + " → " + data.join("/"));
 }
 function multiPartParam(part, parameter, value, when, quiet){
-  const pp = (part.ch - 1) & 0x0F;
+  const pp = part.pp == null ? (part.ch - 1) & 0x0F : part.pp;
   raw([0xF0,0x43,0x10 | DEVICE_NIBBLE,0x7F,0x00,0x37,pp,parameter & 127,value & 127,0xF7], when, true);
-  if(!quiet) line("Part " + part.ch + " · Yamaha 37 " + pp.toString(16).padStart(2,"0") + " " + parameter.toString(16).padStart(2,"0") + " → " + value);
+  if(!quiet) line((part.isPlugin?"PLG1":"Part "+part.ch) + " · Yamaha 37 " + pp.toString(16).padStart(2,"0") + " " + parameter.toString(16).padStart(2,"0") + " → " + value);
 }
 function sendPartReceiveChannel(part, when, quiet){
   multiPartParam(part, 0x03, partReceiveChannel(part), when, quiet);
@@ -674,6 +859,21 @@ function setFxAll(on){
 fxtoggle.onclick=()=>setFxAll(!fxsection.classList.contains("fx-all"));
 addEventListener("keydown",e=>{if(e.key==="Escape"&&fxsection.classList.contains("fx-all"))setFxAll(false);});
 
+const featureTabs=[...document.querySelectorAll(".feature-tabs button")];
+const featurePanels=[...document.querySelectorAll(".feature-panel")];
+function toggleFeaturePanel(panelId){
+  const target=document.getElementById(panelId),willOpen=target.hidden;
+  setFxAll(false);
+  featurePanels.forEach(panel=>panel.hidden=true);
+  featureTabs.forEach(button=>button.setAttribute("aria-expanded","false"));
+  if(willOpen){
+    target.hidden=false;
+    const button=featureTabs.find(item=>item.dataset.panel===panelId);
+    if(button) button.setAttribute("aria-expanded","true");
+  }
+}
+featureTabs.forEach(button=>button.onclick=()=>toggleFeaturePanel(button.dataset.panel));
+
 const env = $("#env"), envfill = $("#envfill");
 function drawEnv(){
   if(!KN.attack) return;
@@ -723,10 +923,11 @@ function remote(msg){
 let LIST = VOICES.slice(), filtered = [];
 const vlist = $("#vlist"), vsearch = $("#vsearch");
 const banksel = $("#banksel");
-BANKS.forEach((bank, i) => banksel.add(new Option(bank.name, i)));
 
 function updateVoiceSearchContext(){
-  const target = RACK_MODE === "multi" ? "Part " + CH : "VOICE";
+  const part=currentPart();
+  const target = RACK_MODE === "voice" ? (VOICE_SOURCE==="plg1"?"VOICE PLG1 PIANO":"VOICE INTERN")
+    : (part.isPlugin?"PLG1":"Part "+part.ch);
   vsearch.placeholder = "Instrument für " + target + " suchen · alle Bänke";
   vsearch.setAttribute("aria-label", "Instrument für " + target + " in allen Bänken suchen");
 }
@@ -742,7 +943,7 @@ enc.innerHTML = '<svg width="50" height="50" viewBox="0 0 56 56" aria-hidden="tr
 $("#enc").appendChild(enc);
 
 function paintEnc(){
-  const part = rows[CH-1], bankData = BANKS[part.bankIndex];
+  const part = currentPart(), bankData = banksForPart(part)[part.bankIndex];
   const program = part.program, f = (program - 1) / Math.max(1, bankData.voices.length - 1);
   enc.querySelector(".arc").setAttribute("stroke-dashoffset", Math.round(132 - f * 99));
   enc.querySelector(".ptr").setAttribute("transform", "rotate(" + Math.round(-135 + f * 270) + " 28 28)");
@@ -756,11 +957,11 @@ function voiceEntry(name){
   return {name, bankIndex:BANKI, program};
 }
 function isCurrentVoice(item){
-  const part = rows[CH-1];
+  const part = currentPart();
   return item.bankIndex === part.bankIndex && item.program === part.program;
 }
 function fillPartVoiceSelect(part){
-  const bank = BANKS[part.bankIndex];
+  const bank = banksForPart(part)[part.bankIndex];
   part.program = Math.max(1, Math.min(bank.voices.length, part.program));
   part.name = bank.voices[part.program-1];
   part.sel.innerHTML = bank.voices.map((name,i) =>
@@ -769,12 +970,12 @@ function fillPartVoiceSelect(part){
 }
 function pickVoice(item, quiet){
   if(typeof item === "string") item = voiceEntry(item);
-  const row = rows[CH-1];
+  const row = currentPart();
   row.bankIndex = Number(item.bankIndex); row.program = Number(item.program); row.name = item.name;
   fillPartVoiceSelect(row);
   setBank(row.bankIndex, true);
-  $("#vsel").textContent = "Part " + CH + " · " + item.name;
-  $("#elemnote").textContent = "Part " + CH + " · " + item.name;
+  updateSelectedLabels();
+  $("#vsel").textContent = partLabel(row) + " · " + item.name;
   vlist.querySelectorAll("button").forEach(b =>
     b.setAttribute("aria-current", Number(b.dataset.bank) === item.bankIndex && Number(b.dataset.program) === item.program));
   paintEnc();
@@ -785,7 +986,8 @@ function renderList(){
   const normalize = text => text.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
   const terms = normalize(vsearch.value.trim().replace(/\.+$/, "")).split(/\s+/).filter(Boolean);
   filtered = [];
-  BANKS.forEach((bank, bankIndex) => {
+  const activeBanks=currentBanks();
+  activeBanks.forEach((bank, bankIndex) => {
     if(!terms.length && bankIndex !== BANKI) return;
     bank.voices.forEach((name, i) => {
       const haystack = normalize(name + " " + bank.name);
@@ -793,9 +995,10 @@ function renderList(){
         filtered.push({name,bankIndex,program:i+1});
     });
   });
-  if(terms.length) $("#vnote").textContent = filtered.length + " Treffer · alle Bänke · Part " + CH;
+  if(terms.length) $("#vnote").textContent = filtered.length + " Treffer · alle Bänke · "
+    + (currentPart().isPlugin?"PLG1":"Part "+currentPart().ch);
   else{
-    const bank = BANKS[BANKI];
+    const bank = activeBanks[BANKI];
     $("#vnote").textContent = bank.voices.length + " Voices · Bank " + bank.msb + "/" + bank.lsb;
   }
   vlist.innerHTML = "";
@@ -805,7 +1008,7 @@ function renderList(){
     b.type = "button"; b.dataset.bank = item.bankIndex; b.dataset.program = item.program;
     const name = document.createElement("span"); name.className = "voice-name"; name.textContent = item.name;
     const where = document.createElement("span"); where.className = "voice-bank";
-    where.textContent = BANKS[item.bankIndex].name + " · Nr. " + item.program;
+    where.textContent = activeBanks[item.bankIndex].name + " · Nr. " + item.program;
     b.append(name,where);
     b.setAttribute("aria-current", isCurrentVoice(item));
     b.onclick = () => pickVoice(item);
@@ -814,12 +1017,32 @@ function renderList(){
   paintEnc();
 }
 window.refreshVoice = () => {
-  const part = rows[CH-1];
-  $("#vsel").textContent = "Part " + CH + " · " + part.name;
+  const part = currentPart();
+  $("#vsel").textContent = partLabel(part) + " · " + part.name;
   setBank(part.bankIndex, true);
   updateVoiceSearchContext();
 };
 vsearch.oninput = renderList;
+
+const voiceSrcInternal=$("#voicesrcinternal"), voiceSrcPlg1=$("#voicesrcplg1");
+function paintVoiceSource(){
+  voiceSrcInternal.setAttribute("aria-pressed",String(VOICE_SOURCE==="internal"));
+  voiceSrcPlg1.setAttribute("aria-pressed",String(VOICE_SOURCE==="plg1"));
+}
+function setVoiceSource(source,sendNow=true){
+  if(source!=="plg1")source="internal";
+  VOICE_SOURCE=source;
+  if(RACK_MODE==="voice")$("#mixmode").textContent="VOICE · "+(source==="plg1"?"PLG1 PIANO":"INTERN");
+  paintVoiceSource(); paintMuteSoloButtons(); updateSelectedLabels();
+  if(window.refreshVoice)window.refreshVoice();
+  if(sendNow&&RACK_MODE==="voice"){
+    allOff(); applyVoiceMute(true); setTimeout(()=>sendPartSetup(currentPart()),35);
+    line("VOICE-Quelle → "+(source==="plg1"?"PLG1 PIANO":"INTERN"));
+  }
+}
+voiceSrcInternal.onclick=()=>setVoiceSource("internal");
+voiceSrcPlg1.onclick=()=>setVoiceSource("plg1");
+paintVoiceSource();
 
 function step(d){
   if(!filtered.length) return;
@@ -840,8 +1063,8 @@ enc.addEventListener("keydown", e => {
   if(e.key === "ArrowDown"){ step(1); e.preventDefault(); }
 });
 renderList();
-$("#vsel").textContent = "Part 1 · " + rows[0].name;
-$("#elemnote").textContent = "Part 1 · " + rows[0].name;
+$("#vsel").textContent = "INTERN · " + voiceInternalPart.name;
+$("#elemnote").textContent = "INTERN · " + voiceInternalPart.name;
 paintEnc();
 
 const voicesection=$("#voicesection"), voicetoggle=$("#voicetoggle");
@@ -923,18 +1146,17 @@ const outsel = $("#outsel"), insel = $("#insel");
 const rackesc = $("#rackesc"), rackmode = $("#rackmode");
 rackmode.value = RACK_MODE;
 function applyRackMode(){
+  rackmode.value = RACK_MODE;
   document.body.dataset.rackMode = RACK_MODE;
   if(RACK_MODE === "voice"){
-    select(0);
-    $("#mixmode").textContent = "VOICE · 1 Kanal";
+    $("#mixmode").textContent = "VOICE · " + (VOICE_SOURCE==="plg1"?"PLG1 PIANO":"INTERN");
     $("#fxmixlabel").textContent = "Voice-Regler";
-    $("#chan").textContent = "VOICE · Kanal 1";
-    $("#elemnote").textContent = "VOICE · " + rows[0].sel.value;
   }else{
-    $("#mixmode").textContent = "Mixer · 16 Parts";
+    $("#mixmode").textContent = "Mixer · PLG1 + 16 Parts";
     $("#fxmixlabel").textContent = "Part und Mix";
-    $("#chan").textContent = "Part " + CH + " · Kanal " + CH;
   }
+  paintVoiceSource(); paintMuteSoloButtons(); updateSelectedLabels();
+  if(window.refreshVoice)window.refreshVoice();
 }
 function rackModeMessage(mode){
   const value = mode === "multi" ? 0x03 : 0x00;
@@ -946,24 +1168,45 @@ function sendRackMode(mode){
     line("Rack-Modus " + label + " vorgemerkt · kein MIDI-Ausgang gewählt");
     return false;
   }
-  raw(rackModeMessage(mode));
-  line("Rack-Modus " + label + " an MOTIF-RACK ES gesendet");
+  const first = performance.now() + 20;
+  raw(rackModeMessage(mode),first,true);
+  raw(rackModeMessage(mode),first + 180,true);
+  line("Rack-Modus " + label + " zweimal an MOTIF-RACK ES gesendet");
   return true;
 }
 let modeSyncTimer = null;
-function scheduleRackSetup(){
+function scheduleRackSetup(delay=430){
   clearTimeout(modeSyncTimer);
   modeSyncTimer = setTimeout(() => {
     if(!OUT) return;
     if(RACK_MODE === "multi") syncAllParts();
-    else sendPartSetup(rows[0]);
-  }, 140);
+    else{
+      applyVoiceMute(true);
+      setTimeout(()=>sendPartSetup(currentPart()),40);
+    }
+  }, delay);
 }
 rackmode.onchange = () => {
-  allOff();
-  RACK_MODE = rackmode.value;
-  applyRackMode();
-  if(sendRackMode(RACK_MODE)) scheduleRackSetup();
+  const requested = rackmode.value;
+  stop(true);
+  if(!OUT){
+    RACK_MODE = requested;
+    applyRackMode();
+    sendRackMode(requested);
+    return;
+  }
+  rackmode.disabled = true;
+  state.textContent = "schalte Rack auf " + requested.toUpperCase() + " …";
+  if(sendRackMode(requested)){
+    clearTimeout(modeSyncTimer);
+    modeSyncTimer = setTimeout(()=>{
+      RACK_MODE = requested;
+      applyRackMode();
+      rackmode.disabled = false;
+      state.textContent = "verbunden · " + OUT.name;
+      scheduleRackSetup(20);
+    },430);
+  }
 };
 applyRackMode();
 rackesc.onclick = () => {
@@ -987,7 +1230,10 @@ function fillPorts(){
 function useOut(){
   OUT = MIDI ? MIDI.outputs.get(outsel.value) || null : null;
   state.textContent = OUT ? "verbunden \u00b7 " + OUT.name : "kein Ausgang gew\u00e4hlt";
-  if(OUT && sendRackMode(RACK_MODE)) scheduleRackSetup();
+  if(OUT){
+    allOff();
+    if(sendRackMode(RACK_MODE)) scheduleRackSetup(430);
+  }
 }
 function useIn(){
   if(IN) IN.onmidimessage = null;
@@ -1012,16 +1258,16 @@ function raw(bytes, when, noRec){
   try{ OUT.send(bytes, when); }catch(err){ line("Fehler: " + err.message); }
 }
 function send(kind, num, val, ch){
-  const c = ((RACK_MODE === "voice" ? 1 : (ch || CH)) - 1) & 15;
+  const c = ((RACK_MODE === "voice" ? 1 : (ch || currentPart().ch)) - 1) & 15;
   const v = Math.max(0, Math.min(127, Math.round(Number(val) || 0)));
   line(kind + " " + num + " \u2192 " + val + "  ch" + (c + 1));
   if(kind === "cc") raw([0xB0 | c, num & 127, v]);
   else if(kind === "note_on") raw([0x90 | c, num & 127, v || 1]);
   else if(kind === "note_off") raw([0x80 | c, num & 127, 0]);
-  else if(kind === "program") sendPartProgram(rows[c]);
+  else if(kind === "program") sendPartProgram(currentPart());
 }
 function sendPartProgram(part, when, quiet, noRec){
-  const bank = BANKS[part.bankIndex], c = (part.ch - 1) & 15;
+  const bank = banksForPart(part)[part.bankIndex], c = (RACK_MODE==="voice"?0:(part.ch - 1) & 15);
   if(RACK_MODE === "multi"){
     multiPartParam(part, 0x00, bank.msb, when, true);
     multiPartParam(part, 0x01, bank.lsb, when == null ? undefined : when + 2, true);
@@ -1031,11 +1277,11 @@ function sendPartProgram(part, when, quiet, noRec){
     raw([0xB0 | c, 32, bank.lsb & 127], when, noRec);
     raw([0xC0 | c, (part.program - 1) & 127], when, noRec);
   }
-  if(!quiet) line("Part " + part.ch + " → " + bank.name.split(" · ")[0] + " · " + part.program + " · " + part.name);
+  if(!quiet) line(partLabel(part) + " → " + bank.name.split(" · ")[0] + " · " + part.program + " · " + part.name);
 }
 function sendPartSetup(part, when){
   sendPartProgram(part, when, true, true);
-  const c = (part.ch - 1) & 15;
+  const c = RACK_MODE==="voice" ? 0 : (part.ch - 1) & 15;
   if(RACK_MODE === "multi"){
     sendPartReceiveChannel(part, when == null ? undefined : when + 6, true);
     multiPartParam(part, 0x0D, Math.round(part.vol.value), when == null ? undefined : when + 8, true);
@@ -1050,10 +1296,17 @@ function sendPartSetup(part, when){
 function syncAllParts(){
   if(!OUT || RACK_MODE !== "multi") return;
   const start = performance.now() + 20;
-  rows.forEach((part, i) => sendPartSetup(part, start + i * 24));
-  line("Alle 16 MULTI-Parts mit Bank, Voice und Mixer an das Rack gesendet");
+  allParts().forEach((part, i) => sendPartSetup(part, start + i * 24));
+  line("PLG1 und alle 16 MULTI-Parts mit Bank, Voice und Mixer an das Rack gesendet");
 }
-function allOff(){ for(let c = 0; c < 16; c++) raw([0xB0 | c, 123, 0], undefined, true); }
+function allOff(){
+  for(let c = 0; c < 16; c++){
+    raw([0xB0 | c, 64, 0],undefined,true);  // Hold/Sustain aus
+    raw([0xB0 | c, 66, 0],undefined,true);  // Sostenuto aus
+    raw([0xB0 | c, 120, 0],undefined,true); // Yamaha: All Sound Off
+    raw([0xB0 | c, 123, 0],undefined,true); // Yamaha: All Notes Off
+  }
+}
 
 /* ============ MIDI IN ============ */
 function midiIn(e){
@@ -1249,13 +1502,14 @@ $("#vfile").onchange = async e => {
   const f = e.target.files[0]; if(!f) return;
   const names = (await f.text()).split(/\r?\n/).map(x => x.split(/[;,\t]/)[0].trim()).filter(Boolean).slice(0, 128);
   if(!names.length) return line("Liste leer");
-  const mine = BANKS.find(b => b.name.indexOf("eigene") === 0);
-  if(mine){ mine.voices = names; setBank(BANKS.indexOf(mine)); }
+  const activeBanks=currentBanks();
+  const mine = activeBanks.find(b => b.custom===true);
+  if(mine){ mine.voices = names; setBank(activeBanks.indexOf(mine)); }
   else{
-    const current = BANKS[BANKI] || BANKS[0];
-    BANKS.push({name:"eigene Liste", msb:current.msb, lsb:current.lsb, voices:names});
-    banksel.add(new Option("eigene Liste", BANKS.length - 1));
-    setBank(BANKS.length - 1);
+    const current = activeBanks[BANKI] || activeBanks[0];
+    activeBanks.push({name:(currentPart().isPlugin?"PLG1 eigene Liste":"eigene Liste"),
+      msb:current.msb,lsb:current.lsb,voices:names,custom:true});
+    setBank(activeBanks.length - 1);
   }
   line(names.length + " Namen aus " + f.name);
   e.target.value = "";
@@ -1263,9 +1517,12 @@ $("#vfile").onchange = async e => {
 
 /* ============ Bank-Umschaltung ============ */
 function setBank(i, quiet){
-  BANKI = Number(i);
+  const activeBanks=currentBanks();
+  BANKI = Math.max(0,Math.min(activeBanks.length-1,Number(i)||0));
+  banksel.innerHTML="";
+  activeBanks.forEach((bank,index)=>banksel.add(new Option(bank.name,index)));
   banksel.value = String(BANKI);
-  const b = BANKS[BANKI];
+  const b = activeBanks[BANKI];
   LIST = b.voices;
   $("#vnote").textContent = b.voices.length + " Voices · Bank " + b.msb + "/" + b.lsb;
   renderList();
@@ -1274,7 +1531,7 @@ function setBank(i, quiet){
 banksel.onchange = () => {
   vsearch.value = "";
   setBank(banksel.value, true);
-  const bankIndex = Number(banksel.value), bank = BANKS[bankIndex];
+  const bankIndex = Number(banksel.value), bank = currentBanks()[bankIndex];
   pickVoice({name:bank.voices[0], bankIndex, program:1});
 };
 setBank(0, true);
@@ -1338,13 +1595,22 @@ $("#ccfile").onchange = async e => {
 /* ============ Komplettes Setup speichern / laden ============ */
 function setupData(){
   return {
-    format:"beyhl-synth-setup", version:12,
-    savedAt:new Date().toISOString(), rackMode:RACK_MODE, selectedPart:CH,
+    format:"beyhl-synth-setup", version:17,
+    savedAt:new Date().toISOString(), rackMode:RACK_MODE, voiceMuted:VOICE_MUTED,voiceSource:VOICE_SOURCE,
+    selectedPart:CH,selectedTarget:SELECTED_PLG?"plg1":"internal",
     keyboard:{base,velocity:Number($("#vel").value),visible:$("#kbtoggle").getAttribute("aria-pressed")==="true"},
     customBanks:BANKS.slice(13).map(bank=>({name:bank.name,msb:bank.msb,lsb:bank.lsb,voices:bank.voices.slice()})),
     parts:rows.map(part=>({bankIndex:part.bankIndex,program:part.program,name:part.name,
       volume:Number(part.vol.value),pan:Number(part.pan.value),reverb:Number(part.rev.value),
       muted:part.muted,soloed:part.soloed})),
+    plugin1:{bankIndex:plgPart.bankIndex,program:plgPart.program,name:plgPart.name,channel:plgPart.ch,
+      volume:Number(plgPart.vol.value),pan:Number(plgPart.pan.value),reverb:Number(plgPart.rev.value),
+      muted:plgPart.muted,soloed:plgPart.soloed,
+      banks:PLG1_BANKS.map(bank=>({name:bank.name,msb:bank.msb,lsb:bank.lsb,voices:bank.voices.slice(),custom:Boolean(bank.custom)}))},
+    voiceInternal:{bankIndex:voiceInternalPart.bankIndex,program:voiceInternalPart.program,name:voiceInternalPart.name,
+      volume:Number(voiceInternalPart.vol.value),pan:Number(voiceInternalPart.pan.value),reverb:Number(voiceInternalPart.rev.value)},
+    voicePlugin:{bankIndex:voicePlgPart.bankIndex,program:voicePlgPart.program,name:voicePlgPart.name,
+      volume:Number(voicePlgPart.vol.value),pan:Number(voicePlgPart.pan.value),reverb:Number(voicePlgPart.rev.value)},
     knobs:KNOB_CONTROLS.map(control=>Number(control.get())),
     elements:ELEMENT_CONTROLS.map(control=>({level:Number(control.lvl.value),tune:Number(control.tune.value),on:control.d.dataset.on==="true"})),
     effects:{reverbType:Number($("#revtype").value),chorusType:Number($("#chotype").value),
@@ -1389,6 +1655,17 @@ function sendLoadedControlsToRack(data){
   restoreEffects(data,true);
   line("Geladene Regler und Effekte an das Rack gesendet");
 }
+function restoreVoicePart(part,saved){
+  if(!saved)return;
+  const banks=banksForPart(part);
+  part.bankIndex=Math.max(0,Math.min(banks.length-1,Number(saved.bankIndex)||0));
+  part.program=Math.max(1,Math.min(banks[part.bankIndex].voices.length,Number(saved.program)||1));
+  part.name=banks[part.bankIndex].voices[part.program-1];
+  part.vol.value=Math.max(0,Math.min(127,saved.volume==null?100:Number(saved.volume)||0));
+  part.pan.value=Math.max(1,Math.min(127,saved.pan==null?64:Number(saved.pan)||64));
+  part.rev.value=Math.max(0,Math.min(127,saved.reverb==null?40:Number(saved.reverb)||0));
+  fillPartVoiceSelect(part);
+}
 function loadSetup(data,fileName){
   if(!data||data.format!=="beyhl-synth-setup"||!Array.isArray(data.parts)) throw new Error("keine Beyhl-Synth-Setup-Datei");
   stop(true);
@@ -1397,7 +1674,6 @@ function loadSetup(data,fileName){
     const exists=BANKS.some(bank=>bank.name===saved.name&&bank.msb===saved.msb&&bank.lsb===saved.lsb);
     if(!exists) BANKS.push({name:String(saved.name),msb:Number(saved.msb)&127,lsb:Number(saved.lsb)&127,voices:saved.voices.map(String).slice(0,128)});
   });
-  banksel.innerHTML=""; BANKS.forEach((bank,i)=>banksel.add(new Option(bank.name,i)));
   (data.ccMapping||[]).forEach((value,i)=>{if(CCREG[i]) CCREG[i].set(Math.max(0,Math.min(127,Number(value)||0)));});
   buildCC();
   data.parts.slice(0,16).forEach((saved,i)=>{
@@ -1409,6 +1685,26 @@ function loadSetup(data,fileName){
     const [mute,solo]=part.row.querySelectorAll("button");
     mute.setAttribute("aria-pressed",String(part.muted)); solo.setAttribute("aria-pressed",String(part.soloed));
   });
+  const savedPlg=data.plugin1||{};
+  if(Array.isArray(savedPlg.banks)){
+    savedPlg.banks.forEach((saved,index)=>{
+      if(!saved||!Array.isArray(saved.voices))return;
+      if(PLG1_BANKS[index])PLG1_BANKS[index].voices=saved.voices.map(String).slice(0,128);
+      else PLG1_BANKS.push({name:String(saved.name||"PLG1 eigene Liste"),msb:Number(saved.msb)&127,
+        lsb:Number(saved.lsb)&127,voices:saved.voices.map(String).slice(0,128),custom:Boolean(saved.custom)});
+    });
+  }
+  plgPart.bankIndex=Math.max(0,Math.min(PLG1_BANKS.length-1,Number(savedPlg.bankIndex)||0));
+  plgPart.program=Math.max(1,Math.min(PLG1_BANKS[plgPart.bankIndex].voices.length,Number(savedPlg.program)||1));
+  plgPart.name=PLG1_BANKS[plgPart.bankIndex].voices[plgPart.program-1];
+  plgPart.ch=Math.max(1,Math.min(16,Number(savedPlg.channel)||1)); plgPart.chSelect.value=String(plgPart.ch);
+  plgPart.vol.value=Math.max(0,Math.min(127,savedPlg.volume==null?100:Number(savedPlg.volume)||0));
+  plgPart.pan.value=Math.max(1,Math.min(127,savedPlg.pan==null?64:Number(savedPlg.pan)||64));
+  plgPart.rev.value=Math.max(0,Math.min(127,savedPlg.reverb==null?40:Number(savedPlg.reverb)||0));
+  plgPart.muted=savedPlg.muted==null?true:Boolean(savedPlg.muted);
+  plgPart.soloed=Boolean(savedPlg.soloed); fillPartVoiceSelect(plgPart);
+  restoreVoicePart(voiceInternalPart,data.voiceInternal);
+  restoreVoicePart(voicePlgPart,data.voicePlugin);
   (data.knobs||[]).forEach((value,i)=>{if(KNOB_CONTROLS[i]) KNOB_CONTROLS[i].set(Number(value),true);});
   (data.elements||[]).forEach((saved,i)=>{
     const control=ELEMENT_CONTROLS[i]; if(!control) return;
@@ -1416,16 +1712,21 @@ function loadSetup(data,fileName){
     control.d.dataset.on=String(saved.on!==false); control.sw.setAttribute("aria-checked",String(saved.on!==false));
     control.show(control.lvl); control.show(control.tune);
   });
+  VOICE_MUTED=Boolean(data.voiceMuted);
+  VOICE_SOURCE=data.voiceSource==="plg1"?"plg1":"internal";
+  SELECTED_PLG=data.selectedTarget==="plg1";
   RACK_MODE=data.rackMode==="multi"?"multi":"voice"; rackmode.value=RACK_MODE; applyRackMode();
   restoreEffects(data,false);
   const keyboard=data.keyboard||{}; base=Math.max(12,Math.min(96,Number(keyboard.base)||48));
   $("#vel").value=Math.max(1,Math.min(127,Number(keyboard.velocity)||100)); buildKeys();
   const visible=keyboard.visible!==false; $("#kbtoggle").setAttribute("aria-pressed",String(visible)); $("#keybar").hidden=!visible;
-  select(Math.max(0,Math.min(15,(Number(data.selectedPart)||1)-1))); refreshVoice();
+  if(RACK_MODE==="multi"&&SELECTED_PLG)selectPlugin();
+  else select(Math.max(0,Math.min(15,(Number(data.selectedPart)||1)-1)));
+  refreshVoice();
   if(OUT){
     sendRackMode(RACK_MODE);
-    setTimeout(()=>{if(RACK_MODE==="multi")syncAllParts();else sendPartSetup(rows[0]);},180);
-    setTimeout(()=>sendLoadedControlsToRack(data),RACK_MODE==="multi"?650:260);
+    scheduleRackSetup(430);
+    setTimeout(()=>sendLoadedControlsToRack(data),RACK_MODE==="multi"?950:650);
   }
   line("Alle Einstellungen aus "+fileName+" geladen");
 }
@@ -1439,7 +1740,7 @@ $("#setupload").onclick=async()=>{
 };
 paintPos();
 
-line("bereit · V12 · DEV 1 fest · Save/Load startet im Musik-Ordner");
+line("bereit · V17 · VOICE INTERN und PLG1 unabhängig vom MULTI · MIDI-Steuerzeichen der Effektbereiche noch nicht hinterlegt");
 </script>
 </body>
 </html>
