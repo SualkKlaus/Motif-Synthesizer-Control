@@ -2,21 +2,23 @@
 
 Free control software for the Yamaha Motif Rack ES, running directly in the browser via the Web MIDI interface.
 
-## Version 17 — with PLG1 Extension
-
-![Beyhl Synth V17 with PLG1 Extension](Beyhl_Synth_V17_PLG1_Extension.png)
+## Version 19 — GM Song Mode, Free Multi Voices and Channel Activity
 
 ## Start
 
-Open the current test version [`beyhl_synth_V17.html`](beyhl_synth_V17.html) in Chrome and allow MIDI access, then connect the Motif Rack ES via USB.
+Open the current version [`beyhl_synth_V19.html`](beyhl_synth_V19.html) in Chrome and allow MIDI access, then connect the Motif Rack ES via USB.
 
-Version 17 uses the Yamaha-documented Multi Part parameter-change addresses to control the 16 internal parts. It adds the installed PLG1 piano board as a separate Part 00 with its own MIDI channel, voice, volume, pan, reverb, mute, and solo controls. PLG1 starts muted in Multi mode so that it cannot play unnoticed alongside an internal part.
+Version 19 uses the Yamaha-documented Multi Part parameter-change addresses to control the 16 internal parts. In Multi mode, the right-side selector switches between **GM from song** and **Free selection on the left**. GM mode reads the initial banks and programs from the loaded MIDI file. Free mode keeps a separate editable setup for all 16 parts, with bank and categorized voice selection directly in the left mixer. Saved free setups can be loaded again later.
 
-In Voice mode, **INTERN** and **PLG1 PIANO** can be selected directly. Both sources remember their own bank, voice, volume, pan, and reverb settings independently from Multi mode. Instrument search follows the selected sound source. Complete setups can be saved under freely chosen names and loaded again through the browser's file dialogs, starting in the Music folder.
+Each MIDI channel has a small activity indicator: gray means unused, green means used by the loaded song, and a short red flash marks an incoming note during playback. The loaded song name remains visible in both Voice and Multi modes. Mixer volumes start at 90 percent for a consistent level.
+
+The installed PLG1 piano board remains available as a separate Part 00 with its own MIDI channel, voice, volume, pan, reverb, mute, and solo controls. In Voice mode, **INTERN** and **PLG1 PIANO** retain independent settings. Complete setups can be saved under freely chosen names and loaded again through the browser's file dialogs.
 
 ## Interface History
 
 All three project screenshots are retained here:
+
+![Beyhl Synth V17 with PLG1 Extension](Beyhl_Synth_V17_PLG1_Extension.png)
 
 ![Beyhl Synth V12 interface](Beyhl_Synth_V12.png)
 

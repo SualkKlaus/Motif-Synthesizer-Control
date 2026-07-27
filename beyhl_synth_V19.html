@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Beyhl Synth V17 &middot; Motif Rack ES</title>
+<title>Beyhl Synth V19 &middot; Motif Rack ES</title>
 <style>
 :root{
   --bg:#0b1016; --panel:#141b24; --panel2:#1a2230; --panel3:#212b3a; --line:#25303f;
@@ -31,7 +31,7 @@ header h1 small{display:block;font:400 11px/1.2 var(--mono);letter-spacing:.18em
 .spacer{margin-left:auto}
 .danger{border-color:#5e2727;color:var(--alarm)}
 
-main{flex:1;display:grid;grid-template-columns:minmax(430px,1fr) minmax(420px,1.05fr);gap:10px;padding:10px;overflow:hidden}
+main{flex:1;display:grid;grid-template-columns:minmax(520px,1.12fr) minmax(420px,1fr);gap:10px;padding:10px;overflow:hidden}
 @media(max-width:1000px){main{grid-template-columns:1fr;overflow:auto}}
 .col{display:flex;flex-direction:column;gap:10px;min-height:0;overflow:auto;padding-right:2px}
 section{background:var(--panel);border:1px solid var(--line);border-radius:10px;display:flex;flex-direction:column;min-height:0}
@@ -41,13 +41,19 @@ section>h2::before{content:"";width:3px;height:13px;border-radius:2px;background
 section>h2 .note{margin-left:auto;font:400 11px/1 var(--mono);letter-spacing:0;text-transform:none;color:var(--dim)}
 .body{padding:11px 13px;overflow:auto;min-height:0}
 
-.mixhead,.mixrow{display:grid;grid-template-columns:26px minmax(90px,1fr) 1fr 62px 62px 30px 30px;gap:8px;align-items:center}
+.mixhead,.mixrow{display:grid;grid-template-columns:26px minmax(92px,.75fr) minmax(110px,1fr) 1fr 62px 62px 30px 30px;gap:8px;align-items:center}
 .mixhead{font:11px/1 var(--mono);color:var(--dim);padding:0 2px 8px;text-transform:uppercase;letter-spacing:.08em}
 .mixrow{padding:4px 2px;border-radius:6px;border:1px solid transparent;cursor:pointer}
+.mixrow.voice-only{grid-template-columns:26px minmax(190px,1.75fr) 1fr 62px 62px 30px 30px}
 .mixrow:hover{background:var(--panel2)}
 .mixrow[aria-current=true]{background:#152740;border-color:var(--part)}
 .mixrow b{font:500 11px/1 var(--mono);color:var(--dim)}
 .mixrow[aria-current=true] b{color:var(--part)}
+.channel-number{display:flex;align-items:center;justify-content:space-between;gap:3px}
+.channel-led{display:inline-block;flex:0 0 7px;width:7px;height:7px;border-radius:50%;background:#4b5663;
+  box-shadow:0 0 0 1px #0b1016;transition:background 45ms linear,box-shadow 45ms linear}
+.channel-led[data-state="used"]{background:#2dd4a7;box-shadow:0 0 5px rgba(45,212,167,.75)}
+.channel-led[data-state="note"]{background:#ef5f5f;box-shadow:0 0 7px rgba(239,95,95,.95)}
 .mixrow select{font-size:12px;padding:3px 5px;width:100%}
 .mixrow.plg{border-color:#315b52;background:#11231f}
 .mixrow.plg b{color:var(--filter)}
@@ -87,13 +93,28 @@ input[type=range]::-moz-range-thumb{width:13px;height:13px;border:none;border-ra
 
 .browser{display:grid;grid-template-columns:72px minmax(0,1fr);gap:11px;align-items:start}
 input[type=search]{width:100%;background:var(--panel2);border:1px solid var(--line);border-radius:6px;padding:5px 8px}
-.vrow{display:flex;gap:6px}
-.vrow select{flex:0 0 46%;font-size:12px}
+.vrow{display:flex;gap:6px;align-items:flex-end}
+.bank-picker{flex:0 0 46%;display:flex;flex-direction:column;gap:3px;min-width:0}
+.bank-picker label{font:700 10px/1 var(--mono);letter-spacing:.08em;color:var(--part)}
+.bank-picker select{width:100%;font-size:12px}
 .vrow input[type=search]{flex:1;min-width:0}
 .voice-source{display:flex;gap:7px;margin-bottom:7px}
 .voice-source button{flex:1;font:700 11px/1 var(--mono);letter-spacing:.04em}
 .voice-source button[aria-pressed=true]{color:#6fffdc;border-color:#247d68;background:#12332c}
 body[data-rack-mode="multi"] .voice-source{display:none}
+.multi-sound-mode{display:none;padding:14px;gap:8px;background:var(--panel2)}
+.multi-sound-mode label{display:flex;flex-direction:column;gap:7px;font:700 11px/1 var(--mono);color:var(--part)}
+.multi-sound-mode select{font-size:16px;font-weight:700;padding:10px;border-color:#285d91;background:#112238}
+.multi-sound-mode p{margin:0;color:var(--mid);font:12px/1.45 var(--mono)}
+body[data-rack-mode="multi"] .multi-sound-mode{display:grid}
+body[data-rack-mode="multi"] #voicebrowser{display:none}
+body[data-rack-mode="multi"] #voicetoggle{display:none}
+.song-title{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.voice-mode-header{display:flex;align-items:center;gap:9px;padding:8px 13px 0;color:var(--mid);
+  font:500 11px/1 var(--mono)}
+.voice-mode-header .note{color:var(--dim)}
+body[data-rack-mode="multi"] .voice-mode-header{display:none}
+body[data-rack-mode="multi"][data-multi-sound-mode="gm"] #mix>.mixrow.plg{display:none}
 .voicepanel{display:flex;flex-direction:column;min-height:0}
 .vlist{margin-top:7px;max-height:132px;overflow:auto;border:1px solid var(--line);border-radius:7px;background:var(--panel2)}
 .vlist button{display:flex;width:100%;text-align:left;border:none;border-radius:0;background:transparent;padding:5px 8px;font-size:12px;color:var(--mid);gap:10px;align-items:center}
@@ -101,6 +122,9 @@ body[data-rack-mode="multi"] .voice-source{display:none}
 .vlist .voice-bank{margin-left:auto;flex:0 0 auto;font:10px/1 var(--mono);color:var(--dim)}
 .vlist button:hover{background:var(--panel3)}
 .vlist button[aria-current=true]{color:var(--part);background:#152740}
+.vlist .voice-category{padding:6px 8px 4px;border-top:1px solid var(--line);color:var(--fg);
+  background:#101a27;font:700 10px/1 var(--mono);letter-spacing:.08em;text-transform:uppercase}
+.vlist .voice-category:first-child{border-top:none}
 .vlist p{margin:8px;font-size:12px;color:var(--dim)}
 .keybar{background:var(--panel);border-top:1px solid var(--line);padding:9px 14px;display:flex;gap:12px;align-items:center}
 .keybar[hidden]{display:none}
@@ -121,6 +145,8 @@ body[data-rack-mode="multi"] .voice-source{display:none}
 .transport .name{flex:0 0 auto;max-width:220px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 #trec[aria-pressed=true]{color:var(--alarm);border-color:#5e2727;background:#2a1416}
 #tloop[aria-pressed=true]{color:var(--filter);border-color:#1e6d5a}
+.song-sound{display:flex;align-items:center;gap:6px}
+.song-sound select{font:12px/1 var(--mono)}
 .bar{flex:1;min-width:130px;height:9px;border-radius:5px;background:#0e1620;border:1px solid var(--line);
      position:relative;cursor:pointer}
 .bar i{position:absolute;top:0;bottom:0;left:0;width:0;border-radius:5px;background:var(--filter)}
@@ -148,6 +174,8 @@ footer{background:var(--panel);border-top:1px solid var(--line);padding:8px 16px
 #fxsection{order:2;flex:0 0 260px!important}
 #mixsection{flex:0 0 360px!important}
 body[data-rack-mode="voice"] #mixsection{flex-basis:145px!important}
+body[data-rack-mode="voice"] #mixsection .mixhead{grid-template-columns:26px minmax(190px,1.75fr) 1fr 62px 62px 30px 30px}
+body[data-rack-mode="voice"] #mixbankhead{display:none}
 body[data-rack-mode="voice"] #mix .mixrow{display:none}
 body[data-rack-mode="voice"] #mix .mixrow.voice-active{display:grid}
 #voicesection.voice-all{position:fixed;z-index:31;inset:10px;box-shadow:0 18px 80px #000;border-color:var(--part)}
@@ -178,8 +206,8 @@ main>.col:nth-child(2)>section:nth-child(3){order:4}
 <body>
 
 <header>
-  <h1>Beyhl Synth<small>V17 &middot; Motif Rack ES</small></h1>
-  <span class="tag live">OUT <select id="outsel" aria-label="MIDI-Ausgang"></select></span>
+  <h1>Beyhl Synth<small>V19 &middot; Motif Rack ES</small></h1>
+  <span class="tag live" id="outtag" hidden><span id="outlabel">MIDI senden</span> <select id="outsel" aria-label="MIDI-Ausgang"></select></span>
   <span class="tag">IN <select id="insel" aria-label="MIDI-Eingang"></select></span>
   <span class="tag live" title="Feste Yamaha-MIDI-Gerätenummer; am Rack darf DeviceNo auf all stehen">DEV 1 · fest</span>
   <span class="tag">RACK <select id="rackmode" aria-label="Aktueller Modus des Rack ES"><option value="voice">VOICE</option><option value="multi">MULTI</option></select></span>
@@ -214,7 +242,7 @@ main>.col:nth-child(2)>section:nth-child(3){order:4}
     <section id="mixsection" style="--accent:var(--part);flex:1">
       <h2><span id="mixmode">Mixer · PLG1 + 16 Parts</span> <span class="note" id="vnote">Voice-Liste: Platzhalter</span></h2>
       <div class="body">
-        <div class="mixhead"><span>#</span><span>Voice</span><span>Volume</span><span>Pan</span><span>Hall</span><span>M</span><span>S</span></div>
+        <div class="mixhead"><span>#</span><span id="mixbankhead">Bank</span><span id="mixvoicehead">Voice</span><span>Volume</span><span>Pan</span><span>Hall</span><span>M</span><span>S</span></div>
         <div id="mix"></div>
       </div>
     </section>
@@ -239,8 +267,15 @@ main>.col:nth-child(2)>section:nth-child(3){order:4}
 
   <div class="col">
     <section id="voicesection" style="--accent:var(--part)">
-      <h2>Voice <span class="note" id="vsel">Part 1</span><button class="fxview" id="voicetoggle" aria-pressed="false">Voices groß</button></h2>
-      <div class="body browser">
+      <h2>Song: <span class="song-title" id="multisongname">kein Song</span></h2>
+      <div class="voice-mode-header"><span id="voiceheading">VOICE-Sound wählen</span><span class="note" id="vsel">Part 1</span><button class="fxview" id="voicetoggle" aria-pressed="false">Voices groß</button></div>
+      <div class="multi-sound-mode" id="multisoundmode">
+        <label for="tsound">MULTI-Instrumente
+          <select id="tsound" aria-label="MULTI-Instrumente"><option value="gm">GM aus Song</option><option value="own">Freie Auswahl links</option></select>
+        </label>
+        <p id="tsoundnote">GM zeigt links die Instrumente der MIDI-Datei. Freie Auswahl übernimmt sie und lässt jeden Part links bearbeiten.</p>
+      </div>
+      <div class="body browser" id="voicebrowser">
         <div id="enc"></div>
         <div class="voicepanel">
           <div class="voice-source" role="group" aria-label="Klangerzeuger im Voice-Modus">
@@ -248,7 +283,10 @@ main>.col:nth-child(2)>section:nth-child(3){order:4}
             <button type="button" id="voicesrcplg1" aria-pressed="false">PLG1 PIANO</button>
           </div>
           <div class="vrow">
-            <select id="banksel" aria-label="Bank"></select>
+            <div class="bank-picker">
+              <label for="banksel">Bank-Auswahl</label>
+              <select id="banksel" aria-label="Bank-Auswahl"></select>
+            </div>
             <input type="search" id="vsearch" placeholder="org…" aria-label="Voice suchen" autocomplete="off">
           </div>
           <div class="vlist" id="vlist"></div>
@@ -328,8 +366,10 @@ main>.col:nth-child(2)>section:nth-child(3){order:4}
 <script>
 const $ = s => document.querySelector(s);
 const logs = $("#logs"), state = $("#state"), aitag = $("#aitag");
-let CH = 1, RACK_MODE = "voice", VOICE_MUTED = false;
+let CH = 1, RACK_MODE = "voice", VOICE_MUTED = false, SONG_GM = false;
 let VOICE_SOURCE = "internal", SELECTED_PLG = false;
+let SONG_PART_STATES = null, MANUAL_PART_STATES = null;
+const tsound = $("#tsound");
 const DEVICE_NIBBLE = 0; // DEV 1; am MOTIF-RACK ES funktioniert dazu DeviceNo = all.
 
 const DRUM_PRE = ["Hyper Std","DryStandrd","NewRock","RockSt1","RockSt2","RockMono1","RockMono2","Hip Hop1","Hip Hop2","Hip Hop3","Hip Hop4","Hip Hop5","Hip Hop6","HipStick1","HipStick2","HipStick3","HipStick4","T9HipKit1","T9HipKit2","R&B Kit1","R&B Kit2","R&B Kit3","AnalogT9","AnalogT8","Tekno Kit","House Kit1","House Kit2","Big Kit","Break Kit","Drum'nBass","Acid Kit","Jungle Kit","Electric","Human Kit","Hard Kit","Distorted","Ambient","Jazz Kit","Orchestral","Garage","All Round","Rock Multi","Hip Multi","Percussion","Latin Perc","Gtr/Bs Fx","Wacko Kit","Wood Bits","Metal Bits","Hands Kit","Scratches","AcstSnares","StSnares","AllKicks","DanceKick","EasySnares","Cuban","SynPopKit","Arabic Mix","BellyDance","DanceSnare","SpecialSFX","Synthetic","SFX Kit"];
@@ -433,11 +473,12 @@ const mix = $("#mix"), rows = [];
 const plgRow = document.createElement("div");
 plgRow.className = "mixrow plg";
 plgRow.innerHTML = '<b title="Plug-in-Part vor den 16 internen Parts">00</b>'
+  + '<select class="partbank" aria-label="Bank PLG1"></select>'
   + '<span class="plgvoicecell"><select class="plgch" aria-label="MIDI-Kanal PLG1">'
   + Array.from({length:16},(_,i)=>'<option value="'+(i+1)+'"'+(i===0?' selected':'')+'>CH '+(i+1)+'</option>').join("")
   + '</select><select class="plgvoice" aria-label="Voice PLG1">'
   + PLG1_BANKS[0].voices.map((v,i)=>'<option'+(i===0?' selected':'')+'>'+v+'</option>').join("") + '</select></span>'
-  + '<input type="range" min="0" max="127" value="100" style="--c:var(--filter)" aria-label="Volume PLG1">'
+  + '<input type="range" min="0" max="127" value="114" style="--c:var(--filter)" aria-label="Volume PLG1">'
   + '<input type="range" min="0" max="127" value="64" style="--c:var(--mid)" aria-label="Pan PLG1">'
   + '<input type="range" min="0" max="127" value="40" style="--c:var(--mix)" aria-label="Hall PLG1">'
   + '<button class="mini" aria-pressed="true" title="PLG1 stummschalten">M</button>'
@@ -445,7 +486,7 @@ plgRow.innerHTML = '<b title="Plug-in-Part vor den 16 internen Parts">00</b>'
 const [plgVol,plgPan,plgRev] = plgRow.querySelectorAll('input[type="range"]');
 const [plgMute,plgSolo] = plgRow.querySelectorAll("button");
 const plgPart = {row:plgRow,vol:plgVol,pan:plgPan,rev:plgRev,ch:1,pp:0x60,isPlugin:true,
-  chSelect:plgRow.querySelector(".plgch"),sel:plgRow.querySelector(".plgvoice"),
+  chSelect:plgRow.querySelector(".plgch"),bankSel:plgRow.querySelector(".partbank"),sel:plgRow.querySelector(".plgvoice"),
   bankIndex:0,program:1,name:PLG1_BANKS[0].voices[0],muted:true,soloed:false};
 mix.appendChild(plgRow);
 plgVol.oninput=()=>sendPartMixValue(plgPart,0x0D,MIXCC.vol,Math.round(plgVol.value));
@@ -467,8 +508,9 @@ plgPart.chSelect.onchange=e=>{e.stopPropagation(); plgPart.ch=Number(plgPart.chS
   line("PLG1 empfängt auf MIDI-Kanal "+plgPart.ch);
 };
 plgPart.sel.onchange=e=>{e.stopPropagation(); selectPlugin();
-  pickVoice({name:plgPart.sel.value,bankIndex:plgPart.bankIndex,program:plgPart.sel.selectedIndex+1});
+  pickVoiceFromPartSelect(plgPart);
 };
+plgPart.bankSel.onchange=e=>{e.stopPropagation(); selectPlugin(); pickPartBank(plgPart,plgPart.bankSel.value);};
 
 function createVoiceOnlyPart(plugin){
   const banks=plugin?PLG1_BANKS:BANKS, label=plugin?"VP":"VI";
@@ -477,7 +519,7 @@ function createVoiceOnlyPart(plugin){
   row.innerHTML='<b title="Eigener Speicher für den Voice-Modus">'+label+'</b>'
     +'<select aria-label="'+(plugin?'PLG1 Piano':'Interne Voice')+'">'
     +banks[0].voices.map((v,i)=>'<option'+(i===0?' selected':'')+'>'+v+'</option>').join("")+'</select>'
-    +'<input type="range" min="0" max="127" value="100" style="--c:'+(plugin?'var(--filter)':'var(--part)')+'" aria-label="Voice Volume">'
+    +'<input type="range" min="0" max="127" value="114" style="--c:'+(plugin?'var(--filter)':'var(--part)')+'" aria-label="Voice Volume">'
     +'<input type="range" min="0" max="127" value="64" style="--c:var(--mid)" aria-label="Voice Pan">'
     +'<input type="range" min="0" max="127" value="40" style="--c:var(--mix)" aria-label="Voice Hall">'
     +'<button class="mini" aria-pressed="false" title="Voice stummschalten">M</button>'
@@ -495,7 +537,7 @@ function createVoiceOnlyPart(plugin){
   solo.onclick=e=>e.stopPropagation();
   row.onclick=activate;
   part.sel.onchange=e=>{e.stopPropagation(); activate();
-    pickVoice({name:part.sel.value,bankIndex:part.bankIndex,program:part.sel.selectedIndex+1});
+    pickVoiceFromPartSelect(part);
   };
   mix.insertBefore(row,plgRow);
   return part;
@@ -506,17 +548,20 @@ const voicePlgPart=createVoiceOnlyPart(true);
 VOICES.slice(0,16).forEach((name, i) => {
   const row = document.createElement("div");
   row.className = "mixrow"; row.setAttribute("aria-current", i === 0);
-  row.innerHTML = '<b>' + String(i+1).padStart(2,"0") + '</b>'
-    + '<select aria-label="Voice Part ' + (i+1) + '">' + VOICES.map((v,j) => '<option' + (j===i?' selected':'') + '>' + v + '</option>').join("") + '</select>'
-    + '<input type="range" min="0" max="127" value="' + (80 + (i*5) % 40) + '" style="--c:var(--part)" aria-label="Volume Part ' + (i+1) + '">'
+  row.innerHTML = '<b class="channel-number">' + String(i+1).padStart(2,"0")
+    + '<i class="channel-led" data-state="unused" aria-label="MIDI-Kanal unbenutzt" title="MIDI-Kanal unbenutzt"></i></b>'
+    + '<select class="partbank" aria-label="Bank Part ' + (i+1) + '"></select>'
+    + '<select aria-label="Voice Part ' + (i+1) + '"></select>'
+    + '<input type="range" min="0" max="127" value="114" style="--c:var(--part)" aria-label="Volume Part ' + (i+1) + '">'
     + '<input type="range" min="0" max="127" value="64" style="--c:var(--mid)" aria-label="Pan Part ' + (i+1) + '">'
     + '<input type="range" min="0" max="127" value="' + (30 + (i*11) % 60) + '" style="--c:var(--mix)" aria-label="Hall Part ' + (i+1) + '">'
     + '<button class="mini" aria-pressed="false" title="Mute">M</button>'
     + '<button class="mini solo" aria-pressed="false" title="Solo">S</button>';
   const [vol, pan, rev] = row.querySelectorAll("input");
   const [mute, solo] = row.querySelectorAll("button");
+  const [bankSel,voiceSel] = row.querySelectorAll("select");
   const ch = i + 1;
-  const part = {row, vol, pan, rev, ch, sel:row.querySelector("select"),
+  const part = {row, vol, pan, rev, ch, sel:voiceSel,bankSel,activityLed:row.querySelector(".channel-led"),
     bankIndex:0, program:i+1, name, muted:false, soloed:false};
   rows.push(part);
   vol.oninput = () => sendPartMixValue(part, 0x0D, MIXCC.vol, Math.round(vol.value));
@@ -539,8 +584,58 @@ VOICES.slice(0,16).forEach((name, i) => {
   row.onclick = () => select(i);
   mix.appendChild(row);
   part.sel.onchange = e => { e.stopPropagation(); select(i);
-    pickVoice({name:part.sel.value, bankIndex:part.bankIndex, program:part.sel.selectedIndex+1}); };
+    pickVoiceFromPartSelect(part); };
+  part.bankSel.onchange = e => { e.stopPropagation(); select(i); pickPartBank(part,part.bankSel.value); };
 });
+
+const CHANNEL_USED = Array(16).fill(false);
+const CHANNEL_FLASH_ENDS = Array(16).fill(null);
+const CHANNEL_FLASH_STARTS = new Set();
+function paintChannelActivity(){
+  rows.forEach((part,index)=>{
+    const used=CHANNEL_USED[index],led=part.activityLed;
+    led.dataset.state=used?"used":"unused";
+    led.setAttribute("aria-label",used?"MIDI-Kanal wird im Song benutzt":"MIDI-Kanal unbenutzt");
+    led.title=used?"MIDI-Kanal wird im Song benutzt":"MIDI-Kanal unbenutzt";
+  });
+}
+function clearChannelFlashes(){
+  CHANNEL_FLASH_STARTS.forEach(timer=>clearTimeout(timer));
+  CHANNEL_FLASH_STARTS.clear();
+  CHANNEL_FLASH_ENDS.forEach((timer,index)=>{
+    clearTimeout(timer); CHANNEL_FLASH_ENDS[index]=null;
+  });
+  paintChannelActivity();
+}
+function setSongUsedChannels(events){
+  clearChannelFlashes();
+  CHANNEL_USED.fill(false);
+  (events||[]).forEach(event=>{
+    const b=event.b;
+    if((b[0]&0xF0)===0x90&&b[2]>0)CHANNEL_USED[b[0]&15]=true;
+  });
+  paintChannelActivity();
+}
+function flashSongChannel(channel,when){
+  if(channel<0||channel>15)return;
+  let startTimer=null;
+  const activate=()=>{
+    if(startTimer!==null)CHANNEL_FLASH_STARTS.delete(startTimer);
+    const led=rows[channel].activityLed;
+    led.dataset.state="note";
+    clearTimeout(CHANNEL_FLASH_ENDS[channel]);
+    CHANNEL_FLASH_ENDS[channel]=setTimeout(()=>{
+      CHANNEL_FLASH_ENDS[channel]=null;
+      led.dataset.state=CHANNEL_USED[channel]?"used":"unused";
+    },140);
+  };
+  const delay=Math.max(0,(when||performance.now())-performance.now());
+  if(delay>4){
+    startTimer=setTimeout(activate,delay);
+    CHANNEL_FLASH_STARTS.add(startTimer);
+  }else activate();
+}
+paintChannelActivity();
 
 function allParts(){ return [plgPart,...rows]; }
 function displayParts(){ return [voiceInternalPart,voicePlgPart,...allParts()]; }
@@ -960,16 +1055,170 @@ function isCurrentVoice(item){
   const part = currentPart();
   return item.bankIndex === part.bankIndex && item.program === part.program;
 }
+const VOICE_CATEGORY_ORDER = [
+  "Piano & Tasten","Orgel","Gitarre","Bass","Streicher","Blechbläser",
+  "Holzbläser","Mallets & Glocken","Chor & Pad","Synth","Ethno",
+  "Schlagzeug & Percussion","Effekte","PLG1","Sonstige"
+];
+function gmVoiceCategory(program){
+  if(program<=8)return "Piano & Tasten";
+  if(program<=16)return "Mallets & Glocken";
+  if(program<=24)return "Orgel";
+  if(program<=32)return "Gitarre";
+  if(program<=40)return "Bass";
+  if(program<=56)return "Streicher";
+  if(program<=64)return "Blechbläser";
+  if(program<=80)return "Holzbläser";
+  if(program<=104)return "Synth";
+  if(program<=112)return "Ethno";
+  if(program<=120)return "Schlagzeug & Percussion";
+  return "Effekte";
+}
+const VOICE_BANK_RANGES = {
+  PRE1:[[67,"Piano & Tasten"],[96,"Mallets & Glocken"],[128,"Orgel"]],
+  PRE2:[[21,"Orgel"],[82,"Gitarre"],[117,"Bass"],[128,"Streicher"]],
+  PRE3:[[52,"Streicher"],[104,"Blechbläser"],[128,"Holzbläser"]],
+  PRE4:[[35,"Ethno"],[56,"Chor & Pad"],[96,"Chor & Pad"],[128,"Synth"]],
+  PRE5:[[10,"Synth"],[48,"Bass"],[128,"Synth"]],
+  PRE6:[[128,"Synth"]],
+  USER1:[[19,"Gitarre"],[29,"Bass"],[37,"Piano & Tasten"],[39,"Mallets & Glocken"],
+    [46,"Streicher"],[47,"Holzbläser"],[48,"Schlagzeug & Percussion"],[56,"Ethno"],
+    [64,"Effekte"],[112,"Synth"],[113,"Schlagzeug & Percussion"],[128,"Synth"]]
+};
+function rangedVoiceCategory(bankKey,program){
+  const ranges=VOICE_BANK_RANGES[bankKey];
+  if(!ranges)return "";
+  const found=ranges.find(entry=>program<=entry[0]);
+  return found?found[1]:"";
+}
+const KNOWN_VOICE_CATEGORIES=new Map();
+["PRE1","PRE2","PRE3","PRE4","PRE5","PRE6","USER1"].forEach(bankKey=>{
+  (RACK_VOICES[bankKey]||[]).forEach((name,index)=>{
+    const category=rangedVoiceCategory(bankKey,index+1);
+    if(category&&!KNOWN_VOICE_CATEGORIES.has(name.toLowerCase()))KNOWN_VOICE_CATEGORIES.set(name.toLowerCase(),category);
+  });
+});
+function voiceCategory(bank,name,program){
+  const bankName=String(bank.name||"").toLowerCase();
+  if(bankName.startsWith("plg1"))return "PLG1";
+  if(bank.msb===127||bank.lsb===32||bank.lsb===40||/drum/.test(bankName))return "Schlagzeug & Percussion";
+  if(bank.msb===0&&bank.lsb===0)return gmVoiceCategory(program);
+  const text=String(name||"").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"");
+  if(/drum|perc|kick|snare|tabla|djem|dhol|kodo|timp|cym|stick|kit\b|conga|bongo|udu\b/.test(text))return "Schlagzeug & Percussion";
+  const bankKey=String(bank.name||"").split(" · ")[0].toUpperCase();
+  const ranged=rangedVoiceCategory(bankKey,program);
+  if(ranged)return ranged;
+  const known=KNOWN_VOICE_CATEGORIES.get(String(name||"").toLowerCase());
+  if(known)return known;
+  if(/flute|sax|oboe|bassoon|clarinet|piccolo|recorder|panfl|pipe|whistle|ocarina|ney\b|kawala|zurna|shehnai|reed/.test(text))return "Holzbläser";
+  if(/trump|trombone|bone\b|horn|brass|fluegel|tpt|tuba|sforz/.test(text))return "Blechbläser";
+  if(/violin|viola|cello|string|pizz|harp|spicat|orchestr|symph|sect\b|ensemble|\bens\b/.test(text))return "Streicher";
+  if(/guitar|\bgtr\b|nylon|steel|strum|fret|overdr|wah|amp|distort|jazzgt|12str|chugga/.test(text))return "Gitarre";
+  if(/bass|\bbs\b|slap|fingerp|pickbass|upright|roundw|activep|basman/.test(text))return "Bass";
+  if(/organ|draw|manual|wheels|soulemn|gospel|church|16\+|16-/.test(text))return "Orgel";
+  if(/piano|grand|ragtime|honky|cp ?80|e\.piano|\bep\b|tine|dyno|wurli|clav|\bdx\b|keys|rhodes/.test(text))return "Piano & Tasten";
+  if(/bell|vibe|marimb|xyloph|celest|glock|kalimb|gamelan|mbira|music box/.test(text))return "Mallets & Glocken";
+  if(/choir|ooh|aah|vox|voice|pad|angel|haah|vocal/.test(text))return "Chor & Pad";
+  if(/synth|lead|saw|pulse|analog|pwm|reso|trance|osc|square|sine|poly|sync|filter/.test(text))return "Synth";
+  if(/sitar|banjo|shamisen|koto|bagpipe|fiddle|oud\b|saz\b|santur|baglama|bou?z|kanun|ethno|arab|indian|gagaku/.test(text))return "Ethno";
+  if(/fx|noise|rain|storm|space|fire|doppler|helicopter|applause|gunshot|seashore|telephone/.test(text))return "Effekte";
+  return "Sonstige";
+}
+function sortedVoiceEntries(bank){
+  return bank.voices.map((name,index)=>({name,program:index+1,category:voiceCategory(bank,name,index+1)}))
+    .sort((a,b)=>VOICE_CATEGORY_ORDER.indexOf(a.category)-VOICE_CATEGORY_ORDER.indexOf(b.category)
+      ||a.name.localeCompare(b.name,"de",{sensitivity:"base"}));
+}
+function fillPartBankSelect(part){
+  if(!part.bankSel)return;
+  const banks=banksForPart(part);
+  part.bankSel.innerHTML="";
+  banks.forEach((bank,index)=>part.bankSel.add(new Option(bank.name.split(" · ")[0],String(index))));
+  part.bankSel.value=String(part.bankIndex);
+}
 function fillPartVoiceSelect(part){
   const bank = banksForPart(part)[part.bankIndex];
   part.program = Math.max(1, Math.min(bank.voices.length, part.program));
   part.name = bank.voices[part.program-1];
-  part.sel.innerHTML = bank.voices.map((name,i) =>
-    '<option value="' + name.replace(/&/g,"&amp;").replace(/"/g,"&quot;") + '">' + name + '</option>').join("");
-  part.sel.selectedIndex = part.program - 1;
+  fillPartBankSelect(part);
+  part.sel.innerHTML="";
+  let category="",group=null;
+  sortedVoiceEntries(bank).forEach(item=>{
+    if(item.category!==category){
+      category=item.category;
+      group=document.createElement("optgroup"); group.label=category; part.sel.appendChild(group);
+    }
+    group.appendChild(new Option(item.name,String(item.program)));
+  });
+  part.sel.value=String(part.program);
+}
+function pickVoiceFromPartSelect(part){
+  const bank=banksForPart(part)[part.bankIndex];
+  const program=Math.max(1,Math.min(bank.voices.length,Number(part.sel.value)||1));
+  pickVoice({name:bank.voices[program-1],bankIndex:part.bankIndex,program});
+}
+function pickPartBank(part,value){
+  const banks=banksForPart(part),bankIndex=Math.max(0,Math.min(banks.length-1,Number(value)||0));
+  pickVoice({name:banks[bankIndex].voices[0],bankIndex,program:1});
+}
+displayParts().forEach(fillPartVoiceSelect);
+function captureMultiParts(){
+  return rows.map(part=>({bankIndex:part.bankIndex,program:part.program,name:part.name,
+    volume:Number(part.vol.value),pan:Number(part.pan.value),reverb:Number(part.rev.value),
+    muted:part.muted,soloed:part.soloed}));
+}
+function cloneMultiParts(states){return (states||[]).map(state=>({...state}));}
+function applyMultiParts(states){
+  if(!Array.isArray(states))return;
+  states.slice(0,16).forEach((saved,index)=>{
+    const part=rows[index],bankIndex=Math.max(0,Math.min(BANKS.length-1,Number(saved.bankIndex)||0));
+    const bank=BANKS[bankIndex],program=Math.max(1,Math.min(bank.voices.length,Number(saved.program)||1));
+    part.bankIndex=bankIndex; part.program=program; part.name=bank.voices[program-1];
+    part.vol.value=Math.max(0,Math.min(127,saved.volume==null?114:Number(saved.volume)||0));
+    part.pan.value=Math.max(1,Math.min(127,saved.pan==null?64:Number(saved.pan)||64));
+    part.rev.value=Math.max(0,Math.min(127,saved.reverb==null?40:Number(saved.reverb)||0));
+    part.muted=Boolean(saved.muted); part.soloed=Boolean(saved.soloed);
+    fillPartVoiceSelect(part);
+    const [mute,solo]=part.row.querySelectorAll("button");
+    mute.setAttribute("aria-pressed",String(part.muted)); solo.setAttribute("aria-pressed",String(part.soloed));
+  });
+  updateSelectedLabels();
+}
+function paintMultiSoundMode(){
+  const gmAvailable=Array.isArray(SONG_PART_STATES);
+  tsound.options[0].disabled=!gmAvailable;
+  if(SONG_GM&&!gmAvailable)SONG_GM=false;
+  tsound.value=SONG_GM?"gm":"own";
+  document.body.dataset.multiSoundMode=SONG_GM?"gm":"own";
+  rows.forEach(part=>{part.bankSel.disabled=SONG_GM;part.sel.disabled=SONG_GM;});
+  plgPart.bankSel.disabled=SONG_GM; plgPart.sel.disabled=SONG_GM; plgPart.chSelect.disabled=SONG_GM;
+  if(RACK_MODE==="multi"){
+    $("#mixmode").textContent=SONG_GM?"Mixer · GM-Instrumente aus dem Song":"Mixer · freie Bank- und Soundauswahl links";
+    $("#vsel").textContent=SONG_GM?"Song-Instrumente aktiv":"Parts links einzeln bearbeiten";
+    $("#tsoundnote").textContent=SONG_GM
+      ?"Links stehen die Instrumente der MIDI-Datei. Die freie Auswahl bleibt getrennt gespeichert."
+      :"Bank und Sound für jeden Part ausschließlich links wählen. Unveränderte Parts bleiben wie im Song.";
+  }
+}
+function setMultiSoundMode(mode,sendNow=true,captureCurrent=true){
+  if(mode==="gm"){
+    if(!Array.isArray(SONG_PART_STATES)){
+      SONG_GM=false; paintMultiSoundMode(); line("GM aus Song: zuerst einen MIDI-Song laden"); return false;
+    }
+    if(captureCurrent&&!SONG_GM)MANUAL_PART_STATES=captureMultiParts();
+    SONG_GM=true; applyMultiParts(SONG_PART_STATES);
+  }else{
+    if(!Array.isArray(MANUAL_PART_STATES))
+      MANUAL_PART_STATES=cloneMultiParts(SONG_PART_STATES||captureMultiParts());
+    SONG_GM=false; applyMultiParts(MANUAL_PART_STATES);
+  }
+  paintMultiSoundMode();
+  if(sendNow&&OUT&&RACK_MODE==="multi")syncAllParts();
+  return true;
 }
 function pickVoice(item, quiet){
   if(typeof item === "string") item = voiceEntry(item);
+  if(RACK_MODE === "multi"&&SONG_GM)setMultiSoundMode("own",false);
   const row = currentPart();
   row.bankIndex = Number(item.bankIndex); row.program = Number(item.program); row.name = item.name;
   fillPartVoiceSelect(row);
@@ -979,6 +1228,7 @@ function pickVoice(item, quiet){
   vlist.querySelectorAll("button").forEach(b =>
     b.setAttribute("aria-current", Number(b.dataset.bank) === item.bankIndex && Number(b.dataset.program) === item.program));
   paintEnc();
+  if(RACK_MODE==="multi")MANUAL_PART_STATES=captureMultiParts();
   if(!quiet) sendPartProgram(row);
 }
 
@@ -992,9 +1242,11 @@ function renderList(){
     bank.voices.forEach((name, i) => {
       const haystack = normalize(name + " " + bank.name);
       if(!terms.length || terms.every(term => haystack.includes(term)))
-        filtered.push({name,bankIndex,program:i+1});
+        filtered.push({name,bankIndex,program:i+1,category:voiceCategory(bank,name,i+1)});
     });
   });
+  filtered.sort((a,b)=>VOICE_CATEGORY_ORDER.indexOf(a.category)-VOICE_CATEGORY_ORDER.indexOf(b.category)
+    ||a.bankIndex-b.bankIndex||a.name.localeCompare(b.name,"de",{sensitivity:"base"}));
   if(terms.length) $("#vnote").textContent = filtered.length + " Treffer · alle Bänke · "
     + (currentPart().isPlugin?"PLG1":"Part "+currentPart().ch);
   else{
@@ -1003,7 +1255,13 @@ function renderList(){
   }
   vlist.innerHTML = "";
   if(!filtered.length){ vlist.innerHTML = "<p>nichts gefunden</p>"; paintEnc(); return; }
+  let shownCategory="";
   filtered.forEach(item => {
+    if(item.category!==shownCategory){
+      shownCategory=item.category;
+      const heading=document.createElement("div"); heading.className="voice-category";
+      heading.textContent=shownCategory; vlist.appendChild(heading);
+    }
     const b = document.createElement("button");
     b.type = "button"; b.dataset.bank = item.bankIndex; b.dataset.program = item.program;
     const name = document.createElement("span"); name.className = "voice-name"; name.textContent = item.name;
@@ -1049,8 +1307,10 @@ function step(d){
   let i = filtered.findIndex(isCurrentVoice);
   if(i < 0) i = d > 0 ? -1 : filtered.length;
   i = Math.min(filtered.length - 1, Math.max(0, i + d));
-  pickVoice(filtered[i]);
-  vlist.children[i] && vlist.children[i].scrollIntoView({block:"nearest"});
+  const item=filtered[i];
+  pickVoice(item);
+  const chosen=vlist.querySelector('button[data-bank="'+item.bankIndex+'"][data-program="'+item.program+'"]');
+  chosen && chosen.scrollIntoView({block:"nearest"});
 }
 enc.addEventListener("pointerdown", e => {
   enc.setPointerCapture(e.pointerId); let y = e.clientY;
@@ -1142,21 +1402,31 @@ addEventListener("keyup", e => {
 
 /* ============ Web MIDI ============ */
 let MIDI = null, OUT = null, IN = null;
-const outsel = $("#outsel"), insel = $("#insel");
+const outsel = $("#outsel"), insel = $("#insel"), outtag = $("#outtag");
 const rackesc = $("#rackesc"), rackmode = $("#rackmode");
 rackmode.value = RACK_MODE;
 function applyRackMode(){
   rackmode.value = RACK_MODE;
   document.body.dataset.rackMode = RACK_MODE;
+  $("#voiceheading").textContent = RACK_MODE === "multi" ? "MULTI-Instrumente" : "VOICE-Sound wählen";
+  $("#mixvoicehead").textContent = RACK_MODE === "multi" ? "Sound · Part anklicken" : "Voice";
+  if(RACK_MODE === "multi" && SELECTED_PLG){
+    SELECTED_PLG = false;
+    plgPart.row.setAttribute("aria-current","false");
+    rows.forEach((part,index)=>part.row.setAttribute("aria-current",index===CH-1));
+  }
+  const songSound = document.getElementById("tsound");
+  if(songSound) songSound.disabled = RACK_MODE === "voice";
   if(RACK_MODE === "voice"){
     $("#mixmode").textContent = "VOICE · " + (VOICE_SOURCE==="plg1"?"PLG1 PIANO":"INTERN");
     $("#fxmixlabel").textContent = "Voice-Regler";
   }else{
-    $("#mixmode").textContent = "Mixer · PLG1 + 16 Parts";
+    $("#mixmode").textContent = "Mixer · Part anklicken, Bank und Sound wählen";
     $("#fxmixlabel").textContent = "Part und Mix";
   }
   paintVoiceSource(); paintMuteSoloButtons(); updateSelectedLabels();
   if(window.refreshVoice)window.refreshVoice();
+  paintMultiSoundMode();
 }
 function rackModeMessage(mode){
   const value = mode === "multi" ? 0x03 : 0x00;
@@ -1217,19 +1487,20 @@ rackesc.onclick = () => {
 function fillPorts(){
   if(!MIDI) return;
   const keepO = outsel.value, keepI = insel.value;
+  const outputs = [...MIDI.outputs.values()];
+  const inputs = [...MIDI.inputs.values()];
+  outtag.hidden = outputs.length === 0;
   outsel.innerHTML = '<option value="">\u2014</option>';
   insel.innerHTML  = '<option value="">\u2014</option>';
-  [...MIDI.outputs.values()].forEach(p => outsel.add(new Option(p.name, p.id)));
-  [...MIDI.inputs.values()].forEach(p => insel.add(new Option(p.name, p.id)));
-  const gO = [...MIDI.outputs.values()].find(p => /motif|yamaha/i.test(p.name));
-  const gI = [...MIDI.inputs.values()].find(p => /motif|yamaha/i.test(p.name));
-  outsel.value = [...MIDI.outputs.keys()].includes(keepO) ? keepO : (gO ? gO.id : "");
-  insel.value  = [...MIDI.inputs.keys()].includes(keepI)  ? keepI  : (gI ? gI.id : "");
+  outputs.forEach(p => outsel.add(new Option(p.name, p.id)));
+  inputs.forEach(p => insel.add(new Option(p.name, p.id)));
+  outsel.value = [...MIDI.outputs.keys()].includes(keepO) ? keepO : (outputs.length === 1 ? outputs[0].id : "");
+  insel.value  = [...MIDI.inputs.keys()].includes(keepI) ? keepI : "";
   useOut(); useIn();
 }
 function useOut(){
   OUT = MIDI ? MIDI.outputs.get(outsel.value) || null : null;
-  state.textContent = OUT ? "verbunden \u00b7 " + OUT.name : "kein Ausgang gew\u00e4hlt";
+  state.textContent = OUT ? "verbunden \u00b7 " + outsel.options[outsel.selectedIndex].text : "kein Ausgang gew\u00e4hlt";
   if(OUT){
     allOff();
     if(sendRackMode(RACK_MODE)) scheduleRackSetup(430);
@@ -1272,6 +1543,9 @@ function sendPartProgram(part, when, quiet, noRec){
     multiPartParam(part, 0x00, bank.msb, when, true);
     multiPartParam(part, 0x01, bank.lsb, when == null ? undefined : when + 2, true);
     multiPartParam(part, 0x02, part.program - 1, when == null ? undefined : when + 4, true);
+    raw([0xB0|c,0,bank.msb&127],when==null?undefined:when+6,true);
+    raw([0xB0|c,32,bank.lsb&127],when==null?undefined:when+8,true);
+    raw([0xC0|c,(part.program-1)&127],when==null?undefined:when+10,true);
   }else{
     raw([0xB0 | c, 0, bank.msb & 127], when, noRec);
     raw([0xB0 | c, 32, bank.lsb & 127], when, noRec);
@@ -1280,14 +1554,15 @@ function sendPartProgram(part, when, quiet, noRec){
   if(!quiet) line(partLabel(part) + " → " + bank.name.split(" · ")[0] + " · " + part.program + " · " + part.name);
 }
 function sendPartSetup(part, when){
-  sendPartProgram(part, when, true, true);
   const c = RACK_MODE==="voice" ? 0 : (part.ch - 1) & 15;
   if(RACK_MODE === "multi"){
-    sendPartReceiveChannel(part, when == null ? undefined : when + 6, true);
-    multiPartParam(part, 0x0D, Math.round(part.vol.value), when == null ? undefined : when + 8, true);
-    multiPartParam(part, 0x0E, Math.max(1, Math.round(part.pan.value)), when == null ? undefined : when + 10, true);
-    multiPartParam(part, 0x12, Math.round(part.rev.value), when == null ? undefined : when + 12, true);
+    sendPartReceiveChannel(part,when,true);
+    sendPartProgram(part,when==null?undefined:when+4,true,true);
+    multiPartParam(part,0x0D,Math.round(part.vol.value),when==null?undefined:when+18,true);
+    multiPartParam(part,0x0E,Math.max(1,Math.round(part.pan.value)),when==null?undefined:when+20,true);
+    multiPartParam(part,0x12,Math.round(part.rev.value),when==null?undefined:when+22,true);
   }else{
+    sendPartProgram(part,when,true,true);
     raw([0xB0 | c, MIXCC.vol, Math.round(part.vol.value)], when, true);
     raw([0xB0 | c, MIXCC.pan, Math.round(part.pan.value)], when, true);
     raw([0xB0 | c, MIXCC.rev, Math.round(part.rev.value)], when, true);
@@ -1296,8 +1571,9 @@ function sendPartSetup(part, when){
 function syncAllParts(){
   if(!OUT || RACK_MODE !== "multi") return;
   const start = performance.now() + 20;
-  allParts().forEach((part, i) => sendPartSetup(part, start + i * 24));
-  line("PLG1 und alle 16 MULTI-Parts mit Bank, Voice und Mixer an das Rack gesendet");
+  const parts=SONG_GM?rows:allParts();
+  parts.forEach((part,i)=>sendPartSetup(part,start+i*28));
+  line((SONG_GM?"Alle 16 GM-Song-Parts":"PLG1 und alle 16 freien MULTI-Parts")+" mit Bank, Voice und Mixer an das Rack gesendet");
 }
 function allOff(){
   for(let c = 0; c < 16; c++){
@@ -1379,7 +1655,7 @@ function parseSMF(buf){
 
 /* ============ Transport ============ */
 let SONG = null, LOOP = false;
-const PLAY = {on:false, t0:0, pos:0, i:0, timer:null};
+const PLAY = {on:false, preparing:false, t0:0, pos:0, i:0, timer:null, prepareTimer:null};
 const REC  = {on:false, t0:0, ev:[]};
 const fill = $("#tfill"), ttime = $("#ttime"), tbar = $("#tbar"), sname = $("#songname");
 
@@ -1390,15 +1666,62 @@ function paintPos(){
   ttime.textContent = mmss(PLAY.pos) + " / " + mmss(len);
   tbar.setAttribute("aria-valuenow", Math.round(f * 100));
 }
+function addMissingGmSetup(ev){
+  const channels = Array.from({length:16},()=>({used:false,bank:false,program:false}));
+  ev.forEach(event=>{
+    const b=event.b, kind=b[0]&0xF0, channel=b[0]&15;
+    if(kind>=0x80&&kind<=0xE0) channels[channel].used=true;
+    if(kind===0xB0&&(b[1]===0||b[1]===32)) channels[channel].bank=true;
+    if(kind===0xC0) channels[channel].program=true;
+  });
+  const setup=[]; let repaired=0;
+  channels.forEach((channel,index)=>{
+    if(!channel.used||channel.bank)return;
+    // GM-Melodiebank 0/0; MIDI-Kanal 10 verwendet die GM-Drumbank 127/0.
+    setup.push({t:0,b:[0xB0|index,0,index===9?127:0]});
+    setup.push({t:0,b:[0xB0|index,32,0]});
+    if(!channel.program) setup.push({t:0,b:[0xC0|index,0]});
+    repaired++;
+  });
+  return {events:setup.concat(ev).sort((a,b)=>a.t-b.t),repaired};
+}
+function songPartStates(ev){
+  const found=Array.from({length:16},(_,channel)=>({msb:channel===9?127:0,lsb:0,program:1,locked:false}));
+  ev.forEach(event=>{
+    const b=event.b,kind=b[0]&0xF0,channel=b[0]&15,part=found[channel];
+    if(part.locked)return;
+    if(kind===0xB0&&b[1]===0)part.msb=b[2]&127;
+    else if(kind===0xB0&&b[1]===32)part.lsb=b[2]&127;
+    else if(kind===0xC0)part.program=(b[1]&127)+1;
+    else if(kind===0x90&&b[2]>0)part.locked=true;
+  });
+  return found.map((part,channel)=>{
+    let bankIndex=BANKS.findIndex(bank=>bank.msb===part.msb&&bank.lsb===part.lsb);
+    if(bankIndex<0)bankIndex=BANKS.findIndex(bank=>channel===9?bank.msb===127&&bank.lsb===0:bank.msb===0&&bank.lsb===0);
+    if(bankIndex<0)bankIndex=0;
+    const bank=BANKS[bankIndex],program=Math.max(1,Math.min(bank.voices.length,part.program));
+    return {bankIndex,program,name:bank.voices[program-1],volume:114,pan:64,reverb:40,muted:false,soloed:false};
+  });
+}
 function loadSong(name, ev){
   ev = ev.filter(e => e.b[0] >= 0x80 && e.b[0] < 0xF0).sort((a, b) => a.t - b.t);
-  if(!ev.length){ sname.textContent = "Song ohne Noten"; return; }
+  if(!ev.length){
+    setSongUsedChannels([]); sname.textContent = "Song ohne Noten";
+    $("#multisongname").textContent = "Song ohne Noten"; return;
+  }
+  const gm=addMissingGmSetup(ev); ev=gm.events;
+  setSongUsedChannels(ev);
   SONG = {name, ev, len:ev[ev.length - 1].t + 600};
+  SONG_PART_STATES=songPartStates(ev);
+  MANUAL_PART_STATES=cloneMultiParts(SONG_PART_STATES);
+  setMultiSoundMode("gm",OUT&&RACK_MODE==="multi",false);
   sname.textContent = name;
+  $("#multisongname").textContent = name;
   PLAY.pos = 0; paintPos();
-  line("Song geladen: " + name + " \u00b7 " + ev.length + " Events \u00b7 " + mmss(SONG.len));
+  line("Song geladen: " + name + " \u00b7 " + ev.length + " Events \u00b7 " + mmss(SONG.len)
+    + (gm.repaired ? " \u00b7 fehlende GM-Bank f\u00fcr " + gm.repaired + " Kan\u00e4le vorbereitet" : ""));
 }
-function play(){
+function startPlayback(){
   if(!SONG || PLAY.on) return;
   if(!OUT) line("kein MIDI-Ausgang \u2013 nichts zu h\u00f6ren");
   if(PLAY.pos >= SONG.len) PLAY.pos = 0;
@@ -1407,28 +1730,50 @@ function play(){
   if(PLAY.i < 0) PLAY.i = SONG.ev.length;
   PLAY.timer = setInterval(pump, 25); pump();
 }
+function play(skipOwnSetup=false){
+  if(!SONG || PLAY.on || PLAY.preparing) return;
+  if(!skipOwnSetup && OUT && RACK_MODE === "multi" && tsound.value === "own"){
+    PLAY.preparing = true;
+    syncAllParts();
+    line("Eigene MULTI-Instrumente vor dem Song wiederhergestellt");
+    PLAY.prepareTimer = setTimeout(()=>{
+      PLAY.preparing = false;
+      startPlayback();
+    },500);
+    return;
+  }
+  startPlayback();
+}
 function pump(){
   const now = performance.now(), horizon = now - PLAY.t0 + 150;
   while(PLAY.i < SONG.ev.length && SONG.ev[PLAY.i].t <= horizon){
     const e = SONG.ev[PLAY.i++];
     const b = songBytesForRackMode(e.b);
-    if(b) raw(b, PLAY.t0 + e.t, true);
+    if(b){
+      if((e.b[0]&0xF0)===0x90&&e.b[2]>0)flashSongChannel(e.b[0]&15,PLAY.t0+e.t);
+      raw(b, PLAY.t0 + e.t, true);
+    }
   }
   PLAY.pos = now - PLAY.t0; paintPos();
-  if(PLAY.pos >= SONG.len){ if(LOOP){ stop(true); PLAY.pos = 0; play(); } else stop(); }
+  if(PLAY.pos >= SONG.len){ if(LOOP){ stop(true); PLAY.pos = 0; play(true); } else stop(); }
 }
 function songBytesForRackMode(bytes){
   const b = Array.from(bytes), kind = b[0] & 0xF0;
-  if(kind === 0xC0) return null; // manuell gewählte Part-Voices nicht durch den Song ersetzen
-  if(kind === 0xB0 && [0,32].includes(b[1])) return null; // Bank Select bleibt bei der Part-Einstellung
-  if(RACK_MODE === "voice"){
-    if(kind === 0xB0 && [7,10,11,91,93].includes(b[1])) return null; // Voice-Regler bleiben beim Benutzer
-    if(kind >= 0x80 && kind <= 0xE0) b[0] = kind; // alle Songspuren auf Kanal 1
+  if(RACK_MODE === "multi"){
+    if(SONG_GM) return b; // MIDI-GM übernimmt Bank und Instrumente aus dem Song.
+    if(kind === 0xC0) return null; // EIGENE PARTS: manuelle Instrumente behalten.
+    if(kind === 0xB0 && [0,7,10,11,32,91,93].includes(b[1])) return null;
+    return b;
   }
+  if(kind === 0xC0) return null; // gewählte Einzel-Voice nicht durch den Song ersetzen
+  if(kind === 0xB0 && [0,7,10,11,32,91,93].includes(b[1])) return null; // Voice-Regler bleiben beim Benutzer
+  if(kind >= 0x80 && kind <= 0xE0) b[0] = kind; // alle Songspuren auf Kanal 1
   return b;
 }
 function stop(quiet){
+  clearTimeout(PLAY.prepareTimer); PLAY.preparing = false;
   clearInterval(PLAY.timer); PLAY.on = false;
+  clearChannelFlashes();
   if(OUT && OUT.clear) OUT.clear();
   allOff(); paintPos();
   if(!quiet) line("stop bei " + mmss(PLAY.pos));
@@ -1444,6 +1789,11 @@ $("#tplay").onclick = play;
 $("#tstop").onclick = () => stop();
 $("#tback").onclick = () => seek(0);
 $("#tloop").onclick = () => { LOOP = !LOOP; $("#tloop").setAttribute("aria-pressed", LOOP); };
+tsound.onchange = () => {
+  if(PLAY.on) stop(true);
+  if(setMultiSoundMode(tsound.value,true))
+    line(SONG_GM ? "Instrumente: GM aus dem MIDI-Song" : "Instrumente: freie Auswahl links");
+};
 tbar.onclick = e => { const b = tbar.getBoundingClientRect(); seek((e.clientX - b.left) / b.width * (SONG ? SONG.len : 0)); };
 tbar.onkeydown = e => {
   if(e.key === "ArrowRight"){ seek(PLAY.pos + 2000); e.preventDefault(); }
@@ -1453,7 +1803,10 @@ $("#tfile").onchange = async e => {
   const f = e.target.files[0]; if(!f) return;
   stop(true);
   try{ loadSong(f.name.replace(/\.midi?$/i, ""), parseSMF(await f.arrayBuffer())); }
-  catch(err){ sname.textContent = "nicht lesbar"; line("Datei nicht lesbar: " + err.message); }
+  catch(err){
+    sname.textContent = "nicht lesbar"; $("#multisongname").textContent = "Song nicht lesbar";
+    line("Datei nicht lesbar: " + err.message);
+  }
   e.target.value = "";
 };
 
@@ -1594,15 +1947,16 @@ $("#ccfile").onchange = async e => {
 
 /* ============ Komplettes Setup speichern / laden ============ */
 function setupData(){
+  const freeParts=cloneMultiParts(SONG_GM?(MANUAL_PART_STATES||captureMultiParts()):captureMultiParts());
+  if(!SONG_GM)MANUAL_PART_STATES=cloneMultiParts(freeParts);
   return {
     format:"beyhl-synth-setup", version:17,
     savedAt:new Date().toISOString(), rackMode:RACK_MODE, voiceMuted:VOICE_MUTED,voiceSource:VOICE_SOURCE,
     selectedPart:CH,selectedTarget:SELECTED_PLG?"plg1":"internal",
     keyboard:{base,velocity:Number($("#vel").value),visible:$("#kbtoggle").getAttribute("aria-pressed")==="true"},
     customBanks:BANKS.slice(13).map(bank=>({name:bank.name,msb:bank.msb,lsb:bank.lsb,voices:bank.voices.slice()})),
-    parts:rows.map(part=>({bankIndex:part.bankIndex,program:part.program,name:part.name,
-      volume:Number(part.vol.value),pan:Number(part.pan.value),reverb:Number(part.rev.value),
-      muted:part.muted,soloed:part.soloed})),
+    multiSoundMode:"own",
+    parts:freeParts,
     plugin1:{bankIndex:plgPart.bankIndex,program:plgPart.program,name:plgPart.name,channel:plgPart.ch,
       volume:Number(plgPart.vol.value),pan:Number(plgPart.pan.value),reverb:Number(plgPart.rev.value),
       muted:plgPart.muted,soloed:plgPart.soloed,
@@ -1661,7 +2015,7 @@ function restoreVoicePart(part,saved){
   part.bankIndex=Math.max(0,Math.min(banks.length-1,Number(saved.bankIndex)||0));
   part.program=Math.max(1,Math.min(banks[part.bankIndex].voices.length,Number(saved.program)||1));
   part.name=banks[part.bankIndex].voices[part.program-1];
-  part.vol.value=Math.max(0,Math.min(127,saved.volume==null?100:Number(saved.volume)||0));
+  part.vol.value=Math.max(0,Math.min(127,saved.volume==null?114:Number(saved.volume)||0));
   part.pan.value=Math.max(1,Math.min(127,saved.pan==null?64:Number(saved.pan)||64));
   part.rev.value=Math.max(0,Math.min(127,saved.reverb==null?40:Number(saved.reverb)||0));
   fillPartVoiceSelect(part);
@@ -1679,12 +2033,13 @@ function loadSetup(data,fileName){
   data.parts.slice(0,16).forEach((saved,i)=>{
     const part=rows[i], bankIndex=Math.max(0,Math.min(BANKS.length-1,Number(saved.bankIndex)||0));
     part.bankIndex=bankIndex; part.program=Math.max(1,Math.min(BANKS[bankIndex].voices.length,Number(saved.program)||1));
-    part.name=BANKS[bankIndex].voices[part.program-1]; part.vol.value=Math.max(0,Math.min(127,Number(saved.volume)||0));
+    part.name=BANKS[bankIndex].voices[part.program-1]; part.vol.value=Math.max(0,Math.min(127,saved.volume==null?114:Number(saved.volume)||0));
     part.pan.value=Math.max(0,Math.min(127,Number(saved.pan)||0)); part.rev.value=Math.max(0,Math.min(127,Number(saved.reverb)||0));
     part.muted=Boolean(saved.muted); part.soloed=Boolean(saved.soloed); fillPartVoiceSelect(part);
     const [mute,solo]=part.row.querySelectorAll("button");
     mute.setAttribute("aria-pressed",String(part.muted)); solo.setAttribute("aria-pressed",String(part.soloed));
   });
+  MANUAL_PART_STATES=captureMultiParts();
   const savedPlg=data.plugin1||{};
   if(Array.isArray(savedPlg.banks)){
     savedPlg.banks.forEach((saved,index)=>{
@@ -1698,7 +2053,7 @@ function loadSetup(data,fileName){
   plgPart.program=Math.max(1,Math.min(PLG1_BANKS[plgPart.bankIndex].voices.length,Number(savedPlg.program)||1));
   plgPart.name=PLG1_BANKS[plgPart.bankIndex].voices[plgPart.program-1];
   plgPart.ch=Math.max(1,Math.min(16,Number(savedPlg.channel)||1)); plgPart.chSelect.value=String(plgPart.ch);
-  plgPart.vol.value=Math.max(0,Math.min(127,savedPlg.volume==null?100:Number(savedPlg.volume)||0));
+  plgPart.vol.value=Math.max(0,Math.min(127,savedPlg.volume==null?114:Number(savedPlg.volume)||0));
   plgPart.pan.value=Math.max(1,Math.min(127,savedPlg.pan==null?64:Number(savedPlg.pan)||64));
   plgPart.rev.value=Math.max(0,Math.min(127,savedPlg.reverb==null?40:Number(savedPlg.reverb)||0));
   plgPart.muted=savedPlg.muted==null?true:Boolean(savedPlg.muted);
@@ -1715,6 +2070,7 @@ function loadSetup(data,fileName){
   VOICE_MUTED=Boolean(data.voiceMuted);
   VOICE_SOURCE=data.voiceSource==="plg1"?"plg1":"internal";
   SELECTED_PLG=data.selectedTarget==="plg1";
+  SONG_GM=false; tsound.value="own";
   RACK_MODE=data.rackMode==="multi"?"multi":"voice"; rackmode.value=RACK_MODE; applyRackMode();
   restoreEffects(data,false);
   const keyboard=data.keyboard||{}; base=Math.max(12,Math.min(96,Number(keyboard.base)||48));
@@ -1740,7 +2096,7 @@ $("#setupload").onclick=async()=>{
 };
 paintPos();
 
-line("bereit · V17 · VOICE INTERN und PLG1 unabhängig vom MULTI · MIDI-Steuerzeichen der Effektbereiche noch nicht hinterlegt");
+line("bereit · V19 · Instrumente: Eigene oder GM · MIDI-Kanäle: grau frei, grün benutzt, rot Note");
 </script>
 </body>
 </html>
