@@ -24,7 +24,9 @@ The installed PLG1 piano board remains available as a separate Part 00 with its 
 
 ## Interface History
 
-All three project screenshots are retained here:
+The current V22 interface and the earlier project screenshots are retained here:
+
+![Beyhl Synth V22 with Mix, Effects, Filter and Amplitude EG](Beyhl_Synth_V22.png)
 
 ![Beyhl Synth V17 with PLG1 Extension](Beyhl_Synth_V17_PLG1_Extension.png)
 
