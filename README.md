@@ -2,19 +2,30 @@
 
 Free control software for the Yamaha Motif Rack ES, running directly in the browser via the Web MIDI interface.
 
-## Version 22 — Working Mix, Effects, Filter and Amplitude EG Controls
+## Version 25 — Integrated Mini Sequencer
 
 ## Start
 
-Open the current version [`beyhl_synth_V22.html`](beyhl_synth_V22.html) in Chrome and allow MIDI access, then connect the Motif Rack ES via USB.
+Open the current version [`beyhl_synth_V25.html`](beyhl_synth_V25.html) in Chrome and allow MIDI access, then connect the Motif Rack ES via USB.
 
 Local source documents, the authoritative MIDI table and the implemented SysEx
 addresses are recorded in [`PROJEKT_NOTIZEN.md`](PROJEKT_NOTIZEN.md).
 
-Version 22 adds working controls for **Mix and Effects**, **Filter**, and
-**Amplitude EG**. Filter and EG now use the offset addresses accepted by the
+Version 25 includes an integrated **mini MIDI sequencer**. Notes played on the
+connected keyboard are recorded while the Motif remains audible, and a scrolling
+piano roll displays the performance in real time. The recorder provides controls
+for return to start, record, stop, playback, a new take, and saving the result as
+a standard MIDI file. The piano roll is intentionally read-only in this version
+to keep recording fast and straightforward.
+
+The working controls for **Mix and Effects**, **Filter**, and **Amplitude EG**
+remain included. Filter and EG use the offset addresses accepted by the
 MOTIF-RACK ES in Voice mode. The Yamaha-documented Multi Part parameter-change
 addresses continue to control the 16 internal parts.
+
+## Demo Video
+
+[Watch the 41-second Synthesizer Demo (MP4)](Synthesizer_Demo.mp4)
 
 In Multi mode, the right-side selector switches between **GM from song** and **Free selection on the left**. GM mode reads the initial banks and programs from the loaded MIDI file. Free mode keeps a separate editable setup for all 16 parts, with bank and categorized voice selection directly in the left mixer. Saved free setups can be loaded again later.
 
@@ -24,7 +35,7 @@ The installed PLG1 piano board remains available as a separate Part 00 with its 
 
 ## Interface History
 
-The current V22 interface and the earlier project screenshots are retained here:
+The V22 interface and the earlier project screenshots are retained here:
 
 ![Beyhl Synth V22 with Mix, Effects, Filter and Amplitude EG](Beyhl_Synth_V22.png)
 

@@ -6,7 +6,7 @@ die Weiterentwicklung des Bedienprogramms fest.
 ## Projektdateien
 
 - Projektordner: `/home/klaus/Dokumente/GitHub Projekte/Motif-Synthesizer-Control`
-- Aktuelle Programmversion: `beyhl_synth_V22.html`
+- Aktuelle Programmversion: `beyhl_synth_V25.html`
 - Zielgerät: Yamaha MOTIF-RACK ES
 
 ## Verbindliche MIDI-Quelle
@@ -50,8 +50,14 @@ Das im Programm verwendete SysEx-Schema lautet:
 F0 43 10 7F 00 37 pp xx value F7
 ```
 
-Die Umsetzung befindet sich in `beyhl_synth_V22.html` in der Funktion
+Die Umsetzung befindet sich in `beyhl_synth_V25.html` in der Funktion
 `multiPartParam()`.
+
+## Stand V25
+
+V25 enthält zusätzlich einen kleinen MIDI-Sequenzer mit laufender, nicht
+editierbarer Piano-Rolle, Aufnahme, Stopp, Wiedergabe, Neuaufnahme und
+bestätigtem Speichern als Standard-MIDI-Datei.
 
 ## Stand V22
 
