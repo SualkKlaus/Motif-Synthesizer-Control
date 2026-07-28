@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Beyhl Synth V19 &middot; Motif Rack ES</title>
+<title>Beyhl Synth V22 &middot; Motif Rack ES</title>
 <style>
 :root{
   --bg:#0b1016; --panel:#141b24; --panel2:#1a2230; --panel3:#212b3a; --line:#25303f;
@@ -193,7 +193,7 @@ main>.col:nth-child(2)>section:nth-child(3){order:4}
 @media(max-width:600px){#fxsection.fx-all{inset:4px}#fxsection.fx-all .fxgroups{grid-template-columns:1fr}}
 .feature-warning{order:2;border:1px solid #9a3434;background:#30191d;color:#ff8181;border-radius:8px;
   padding:9px 12px;text-align:center;font:700 13px/1.2 var(--mono);letter-spacing:.08em;text-transform:uppercase}
-.feature-tabs{order:3;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.feature-tabs{order:3;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
 .feature-tabs button{white-space:normal;min-height:42px}
 .feature-tabs button[aria-expanded=true]{color:var(--fg);border-color:var(--part);background:#14263b;box-shadow:inset 0 0 0 1px #285d91}
 .feature-panel{order:4!important;flex:1 1 auto!important;min-height:0}
@@ -201,12 +201,34 @@ main>.col:nth-child(2)>section:nth-child(3){order:4}
 #fxsection.feature-panel .fxscroll{max-height:none;flex:1;overflow:auto}
 #fxsection.feature-panel{flex-basis:auto!important}
 @media(max-width:700px){.feature-tabs{grid-template-columns:1fr}}
+
+/* Voice Edit */
+#editsection .editscroll{flex:1;overflow:auto}
+#editgroups{margin-top:10px}
+.edithint{margin:0 0 9px;font-size:12px;line-height:1.5;color:var(--mid)}
+.edithint b{color:var(--fg)}
+.editgrp{border:1px solid var(--line);border-radius:8px;background:var(--panel2);margin-bottom:8px}
+.editgrp>summary{cursor:pointer;padding:9px 11px;font:500 13px/1.2 system-ui;list-style:none;
+  display:flex;align-items:center;gap:8px;color:var(--fg)}
+.editgrp>summary::-webkit-details-marker{display:none}
+.editgrp>summary::before{content:"\25B6";font-size:9px;color:var(--dim);transition:transform .15s}
+.editgrp[open]>summary::before{transform:rotate(90deg)}
+.editsub{margin:0 8px 8px;border:1px solid var(--line);border-radius:6px;background:var(--panel)}
+.editsub>summary{cursor:pointer;padding:7px 9px;font:12px/1.2 var(--mono);color:var(--dim);list-style:none}
+.editsub>summary::-webkit-details-marker{display:none}
+.editsub[open]>summary{color:var(--filter)}
+.editrows{padding:3px 9px 4px;display:grid;gap:8px}
+.editrow{display:grid;grid-template-columns:1fr auto;gap:4px 8px;align-items:center;font-size:12px}
+.editrow .lab{color:var(--mid)}
+.editrow output{font:12px/1 var(--mono);color:var(--fg);text-align:right;min-width:58px}
+.editrow input[type=range],.editrow select{grid-column:1/-1;width:100%}
+.editsend{margin:0 9px 9px;font-size:12px;padding:4px 9px}
 </style>
 </head>
 <body>
 
 <header>
-  <h1>Beyhl Synth<small>V19 &middot; Motif Rack ES</small></h1>
+  <h1>Beyhl Synth<small>V22 &middot; Motif Rack ES</small></h1>
   <span class="tag live" id="outtag" hidden><span id="outlabel">MIDI senden</span> <select id="outsel" aria-label="MIDI-Ausgang"></select></span>
   <span class="tag">IN <select id="insel" aria-label="MIDI-Eingang"></select></span>
   <span class="tag live" title="Feste Yamaha-MIDI-Gerätenummer; am Rack darf DeviceNo auf all stehen">DEV 1 · fest</span>
@@ -294,30 +316,31 @@ main>.col:nth-child(2)>section:nth-child(3){order:4}
       </div>
     </section>
 
-    <div class="feature-warning" role="note">MIDI-Steuerzeichen noch nicht hinterlegt</div>
+    <div class="feature-warning" role="note">Filter und EG senden jetzt die Offset-Adressen 40 70, die das Rack im VOICE-Modus annimmt</div>
     <div class="feature-tabs" role="group" aria-label="Bereiche ohne hinterlegte MIDI-Steuerzeichen">
       <button type="button" data-panel="fxsection" aria-expanded="false">Mix und Effekte</button>
       <button type="button" data-panel="filtersection" aria-expanded="false">Filter</button>
       <button type="button" data-panel="egsection" aria-expanded="false">Amplitude EG</button>
+      <button type="button" data-panel="editsection" aria-expanded="false">Voice Edit</button>
     </div>
 
     <section id="filtersection" class="feature-panel" style="--accent:var(--filter)" hidden>
-      <h2>Filter <span class="note">cc74 / cc71</span></h2>
+      <h2>Filter <span class="note">40 70 47 / 48</span></h2>
       <div class="body two">
         <div>
-          <div class="pad" id="pad" tabindex="0" role="slider" aria-label="Cutoff und Resonanz" aria-valuetext="Cutoff 76, Resonanz 51">
+          <div class="pad" id="pad" tabindex="0" role="slider" aria-label="Cutoff und Resonanz" aria-valuetext="Cutoff 64, Resonanz 64">
             <div class="g" style="left:0;right:0;top:50%;height:1px"></div>
             <div class="g" style="top:0;bottom:0;left:50%;width:1px"></div>
-            <div class="dot" id="dot" style="left:60%;top:40%"></div>
+            <div class="dot" id="dot" style="left:50%;top:50%"></div>
           </div>
-          <p class="num" id="padout" style="text-align:left;margin:8px 0 0">cutoff 76 · resonanz 51</p>
+          <p class="num" id="padout" style="text-align:left;margin:8px 0 0">cutoff 64 · resonanz 64</p>
         </div>
         <div class="knobs" id="fil"></div>
       </div>
     </section>
 
     <section id="egsection" class="feature-panel" style="--accent:var(--env)" hidden>
-      <h2>Amplitude EG</h2>
+      <h2>Amplitude EG <span class="note">40 70 49 / 37 / 38 / 4A</span></h2>
       <div class="body">
         <svg viewBox="0 0 420 96" style="width:100%;height:96px;background:var(--panel2);border:1px solid var(--line);border-radius:8px" role="img" aria-label="Hüllkurve">
           <polygon id="envfill" fill="#8b7bf7" opacity=".16"></polygon>
@@ -346,6 +369,18 @@ main>.col:nth-child(2)>section:nth-child(3){order:4}
             <div class="knobs" id="choparams"></div>
           </article>
         </div>
+      </div>
+    </section>
+
+    <section id="editsection" class="feature-panel" style="--accent:var(--elem)" hidden>
+      <h2>Voice Edit (noch nicht programmiert) <span class="note">SysEx Parameter Change</span></h2>
+      <div class="body editscroll">
+        <p class="edithint"><b>Quick Edit</b> nutzt den Offset-Block 40&nbsp;70 &ndash; das sind die Regler,
+          die das Rack im <b>VOICE</b>-Modus sicher annimmt. Die Bl&ouml;cke darunter sind die vollen
+          Element-Adressen der Data List; das Rack schreibt sie nur beim Bulk Dump.
+          Schieber senden beim Loslassen, Auswahlfelder sofort.</p>
+        <button type="button" id="editsendall">Ge&auml;nderte Werte an das Rack senden</button>
+        <div id="editgroups"></div>
       </div>
     </section>
   </div>
@@ -420,7 +455,7 @@ addEventListener("unhandledrejection", event => {
   line("Programmfehler: " + (event.reason && event.reason.message || event.reason));
 });
 
-function knob(host, {label, cc, value, color, id}){
+function knob(host, {label, cc, value, color, id, syx}){
   const el = document.createElement("div");
   el.className = "knob"; el.tabIndex = 0; el.setAttribute("role","slider");
   el.setAttribute("aria-label", label); el.setAttribute("aria-valuemin",0); el.setAttribute("aria-valuemax",127);
@@ -441,13 +476,16 @@ function knob(host, {label, cc, value, color, id}){
   const api = {el, label, get: () => v, getCC: () => ccNum,
     setCC(n){ ccUnindex(ccNum, api); ccNum = n; ccIndex(ccNum, api); paint(); },
     set(n, quiet){ v = Math.min(127, Math.max(0, n)); paint();
-      if(!quiet && ccNum) send("cc", ccNum, Math.round(v)); drawEnv(); }};
+      if(!quiet){ if(ccNum) send("cc", ccNum, Math.round(v));
+                  if(syx != null) offsetSend(syx, Math.round(v), label); }
+      drawEnv(); }};
   el.addEventListener("pointerdown", e => {
     el.setPointerCapture(e.pointerId); const y0 = e.clientY, v0 = v;
     const mv = ev => api.set(v0 + (y0 - ev.clientY) * 0.8, true);
     el.addEventListener("pointermove", mv);
     el.addEventListener("pointerup", () => { el.removeEventListener("pointermove", mv);
-      if(ccNum) send("cc", ccNum, Math.round(v)); }, {once:true});
+      if(ccNum) send("cc", ccNum, Math.round(v));
+      if(syx != null) offsetSend(syx, Math.round(v), label); }, {once:true});
   });
   el.addEventListener("keydown", e => {
     const s = e.shiftKey ? 10 : 1;
@@ -756,11 +794,11 @@ for(let e = 1; e <= 4; e++){
   CCREG.push({label:"Element " + e + " ein/aus", get: () => cfg.sw, set: n => cfg.sw = n});
 }
 
-knob($("#fil"), {label:"Cutoff", cc:74, value:76, color:"#2dd4a7", id:"cut"});
-knob($("#fil"), {label:"Resonanz", cc:71, value:51, color:"#2dd4a7", id:"res"});
-knob($("#fil"), {label:"EG Depth", cc:70, value:44, color:"#2dd4a7"});
-[["Attack",73,20],["Decay",75,60],["Sustain",79,90],["Release",72,70]]
-  .forEach(([l,cc,v]) => knob($("#eg"), {label:l, cc, value:v, color:"#8b7bf7", id:l.toLowerCase()}));
+knob($("#fil"), {label:"Cutoff", cc:74, value:64, color:"#2dd4a7", id:"cut", syx:0x47});
+knob($("#fil"), {label:"Resonanz", cc:71, value:64, color:"#2dd4a7", id:"res", syx:0x48});
+knob($("#fil"), {label:"FEG Depth", cc:70, value:64, color:"#2dd4a7", syx:0x3D});
+[["Attack",73,0x49],["Decay",75,0x37],["Sustain",79,0x38],["Release",72,0x4A]]
+  .forEach(([l,cc,syx]) => knob($("#eg"), {label:l, cc, value:64, color:"#8b7bf7", id:l.toLowerCase(), syx}));
 [["Volume",7,100],["Pan",10,64],["Hall",91,64],["Chorus",93,20],["Expression",11,127],["Portamento",5,0],["Brightness",74,76],["Mod",1,0]]
   .forEach(([l,cc,v]) => knob($("#fx"), {label:l, cc, value:v, color:"#f2a33c"}));
 
@@ -969,6 +1007,300 @@ function toggleFeaturePanel(panelId){
 }
 featureTabs.forEach(button=>button.onclick=()=>toggleFeaturePanel(button.dataset.panel));
 
+/* ============ Offset-Regler 40 70: die Adressen, die das Rack im VOICE-Modus annimmt ============ */
+function offsetSend(lo, value, label, quiet, when){
+  const v = Math.max(0, Math.min(127, Math.round(Number(value) || 0)));
+  raw([0xF0, 0x43, 0x10 | DEVICE_NIBBLE, 0x7F, 0x00, 0x40, 0x70, lo & 127, v, 0xF7], when, true);
+  EDIT_STATE[editKey(0x40, 0x70, lo)] = lo === 0x35 ? v : v - 64;
+  if(!quiet) line(editWarn() + "40 70 " + hex2(lo) + " \u00b7 " + label
+    + " \u2192 " + (lo === 0x35 ? v : signText(v - 64)));
+}
+
+/* ============ Voice Edit: echte Parameter-Change-Adressen (Data List S. 62 ff.) ============ */
+const EDIT_STATE = {};
+const EDIT_CONTROLS = [];
+const NOTE_LABELS = ["C","C#","D","D#","E","F","F#","G","G#","A","A#","B"];
+const noteText = v => NOTE_LABELS[((v % 12) + 12) % 12] + (Math.floor(v / 12) - 2);
+const signText = v => (v > 0 ? "+" : "") + v;
+const hex2 = v => v.toString(16).toUpperCase().padStart(2, "0");
+const SIGN64 = {off:64, fmt:signText};
+const SIGN128 = {off:128, size:2, fmt:signText};
+const ON_OFF = ["aus", "ein"];
+const centered = v => signText(v - 64);
+
+function EP(lo, name, min, max, def, extra){ return Object.assign({lo, name, min, max, def}, extra || {}); }
+function ES(lo, name, opts, def){ return {lo, name, opts, min:0, max:opts.length - 1, def}; }
+
+const ELEM_SUBS = [
+  {title:"Oszillator und Zonen", hi:0x41, params:[
+    ES(0x00, "Element", ON_OFF, 1),
+    EP(0x08, "Pan", 1, 127, 64, {fmt:centered}),
+    EP(0x09, "Random Pan", 0, 127, 0),
+    EP(0x0A, "Alternate Pan", 0, 127, 64, {fmt:centered}),
+    EP(0x0B, "Scaling Pan", 0, 127, 64, {fmt:centered}),
+    EP(0x0C, "Note Limit tief", 0, 127, 0, {fmt:noteText}),
+    EP(0x0D, "Note Limit hoch", 0, 127, 127, {fmt:noteText}),
+    EP(0x0E, "Velocity tief", 1, 127, 1),
+    EP(0x0F, "Velocity hoch", 1, 127, 127),
+    EP(0x10, "Velocity Crossfade", 0, 127, 0),
+    EP(0x11, "Key On Delay", 0, 127, 0),
+    ES(0x16, "Insert-Effekt", ["thru", "Insert 1", "Insert 2"], 0)
+  ]},
+  {title:"Amplitude und AEG", hi:0x41, params:[
+    EP(0x20, "Element Level", 0, 127, 100),
+    EP(0x21, "Level Velocity", -64, 63, 0, SIGN64),
+    EP(0x24, "AEG Attack Zeit", 0, 127, 0),
+    EP(0x25, "AEG Decay 1 Zeit", 0, 127, 64),
+    EP(0x26, "AEG Decay 2 Zeit", 0, 127, 64),
+    EP(0x27, "AEG Release Zeit", 0, 127, 64),
+    EP(0x28, "AEG Startpegel", 0, 127, 0),
+    EP(0x29, "AEG Attack Pegel", 0, 127, 127),
+    EP(0x2A, "AEG Decay 1 Pegel", 0, 127, 127),
+    EP(0x2B, "AEG Decay 2 Pegel", 0, 127, 127),
+    ES(0x2D, "AEG Zeit-Velocity Bereich", ["Attack", "Attack+Decay", "Decay", "Attack+Release", "alle"], 0),
+    EP(0x2E, "AEG Zeit-Velocity", -64, 63, 0, SIGN64),
+    EP(0x2F, "Level Key Follow", -64, 63, 0, SIGN64)
+  ]},
+  {title:"Pitch und PEG", hi:0x42, params:[
+    EP(0x00, "Coarse Tune", -48, 48, 0, SIGN64),
+    EP(0x01, "Fine Tune", -64, 63, 0, SIGN64),
+    EP(0x02, "Velocity zu Pitch", -64, 63, 0, SIGN64),
+    EP(0x04, "Random Pitch", 0, 127, 0),
+    EP(0x05, "PEG Hold Zeit", 0, 127, 0),
+    EP(0x06, "PEG Attack Zeit", 0, 127, 0),
+    EP(0x07, "PEG Decay 1 Zeit", 0, 127, 0),
+    EP(0x08, "PEG Decay 2 Zeit", 0, 127, 0),
+    EP(0x09, "PEG Release Zeit", 0, 127, 0),
+    EP(0x0A, "PEG Hold Pegel", -128, 127, 0, SIGN128),
+    EP(0x0C, "PEG Attack Pegel", -128, 127, 0, SIGN128),
+    EP(0x0E, "PEG Decay 1 Pegel", -128, 127, 0, SIGN128),
+    EP(0x10, "PEG Decay 2 Pegel", -128, 127, 0, SIGN128),
+    EP(0x12, "PEG Release Pegel", -128, 127, 0, SIGN128),
+    EP(0x14, "PEG Tiefe", -64, 63, 0, SIGN64)
+  ]},
+  {title:"Filter und FEG", hi:0x43, params:[
+    ES(0x00, "Filtertyp", ["LPF24D","LPF24A","LPF18","LPF18s","LPF12","LPF6","HPF24D","HPF12","BPF12D",
+      "BPFw","BPF6","BEF12","BEF6","Dual LPF","Dual HPF","Dual BPF","Dual BEF","LPF12+BPF6","thru"], 0),
+    EP(0x01, "Cutoff", 0, 255, 255, {size:2}),
+    EP(0x03, "Cutoff Velocity", -64, 63, 0, SIGN64),
+    EP(0x05, "Resonanz / Breite", 0, 127, 0),
+    EP(0x06, "Resonanz Velocity", -64, 63, 0, SIGN64),
+    EP(0x07, "HPF Cutoff", 0, 255, 0, {size:2}),
+    EP(0x0A, "Abstand (Dual-Filter)", 0, 255, 0, {size:2}),
+    EP(0x0C, "Filter Gain", 0, 255, 128, {size:2}),
+    EP(0x0E, "FEG Hold Zeit", 0, 127, 0),
+    EP(0x0F, "FEG Attack Zeit", 0, 127, 0),
+    EP(0x10, "FEG Decay 1 Zeit", 0, 127, 0),
+    EP(0x11, "FEG Decay 2 Zeit", 0, 127, 0),
+    EP(0x12, "FEG Release Zeit", 0, 127, 0),
+    EP(0x1D, "FEG Tiefe", -64, 63, 0, SIGN64)
+  ]},
+  {title:"Element-EQ", hi:0x44, params:[
+    ES(0x00, "EQ-Typ", ["EQ tief/hoch", "Peaking EQ", "Boost 6", "Boost 12", "Boost 18", "thru"], 5),
+    EP(0x01, "EQ Resonanz", 0, 31, 0),
+    EP(0x02, "EQ 1 Frequenz", 46, 251, 46, {size:2}),
+    EP(0x04, "EQ 1 Gain", -32, 32, 0, SIGN64),
+    EP(0x05, "EQ 2 Frequenz", 131, 241, 131, {size:2}),
+    EP(0x07, "EQ 2 Gain", -32, 32, 0, SIGN64)
+  ]},
+  {title:"Element-LFO", hi:0x44, params:[
+    ES(0x40, "LFO Welle", ["Saw", "Dreieck", "Rechteck"], 1),
+    ES(0x41, "Key On Sync", ON_OFF, 0),
+    EP(0x42, "LFO Key On Delay", 0, 127, 0),
+    EP(0x43, "LFO Speed", 0, 63, 32),
+    EP(0x44, "Amplituden-Modulation", 0, 127, 0),
+    EP(0x45, "Pitch-Modulation", 0, 127, 0),
+    EP(0x46, "Filter-Modulation", 0, 127, 0),
+    EP(0x47, "LFO Fade In", 0, 127, 0)
+  ]}
+];
+
+const LFO_TARGETS = ["Amplitude", "Pitch", "Filter", "Resonanz", "Pan", "Element-LFO-Speed"];
+const COMMON_SUBS = [
+  {title:"Voice allgemein", hi:0x40, mid:0x00, params:[
+    EP(0x01, "Volume", 0, 127, 100),
+    ES(0x02, "gleiche Note", ["einfach", "mehrfach"], 0),
+    ES(0x03, "Mono / Poly", ["mono", "poly"], 1),
+    ES(0x04, "Micro Tuning", ["gleichstufig","Pur Dur","Pur Moll","Werckmeister","Kirnberger",
+      "Vallotti&Young","1/4 Shift","1/4 Ton","1/8 Ton","Indisch","Arabisch 1","Arabisch 2","Arabisch 3"], 0),
+    ES(0x0F, "Micro Tuning Grundton", NOTE_LABELS, 0),
+    EP(0x05, "Pitch Bend aufwaerts", -48, 24, 2, SIGN64),
+    EP(0x06, "Pitch Bend abwaerts", -48, 24, -2, SIGN64),
+    ES(0x07, "Portamento Modus", ["fingered", "fulltime"], 0),
+    ES(0x08, "Portamento", ON_OFF, 0),
+    EP(0x09, "Portamento Zeit", 0, 127, 0),
+    ES(0x0A, "Portamento Zeitmodus", ["Rate 1", "Time 1", "Rate 2", "Time 2"], 0),
+    EP(0x0B, "Hall Send", 0, 127, 40),
+    EP(0x0C, "Chorus Send", 0, 127, 20),
+    EP(0x10, "Legato Slope", 0, 7, 0)
+  ]},
+  {title:"Common LFO", hi:0x40, mid:0x06, params:[
+    ES(0x00, "LFO Phase", ["0", "90", "120", "180", "240", "270"], 0),
+    ES(0x01, "LFO Welle", ["Dreieck","Dreieck+","Saw auf","Saw ab","Rechteck 1/4","Rechteck 1/3",
+      "Rechteck","Rechteck 2/3","Rechteck 3/4","Trapez","S/H 1","S/H 2","eigene"], 0),
+    EP(0x02, "LFO Speed", 0, 63, 32),
+    ES(0x04, "Tempo Sync", ON_OFF, 0),
+    EP(0x05, "LFO Delay", 0, 127, 0),
+    EP(0x06, "LFO Fade In", 0, 127, 0),
+    EP(0x07, "LFO Hold", 0, 127, 127),
+    EP(0x08, "LFO Fade Out", 0, 127, 0),
+    ES(0x09, "Key On Reset", ["aus", "jede Note", "erste Note"], 0),
+    ES(0x0A, "Ziel 1", LFO_TARGETS, 1),
+    EP(0x0B, "Tiefe 1", 0, 127, 0),
+    ES(0x0D, "Ziel 2", LFO_TARGETS, 0),
+    EP(0x0E, "Tiefe 2", 0, 127, 0),
+    ES(0x10, "Ziel 3", LFO_TARGETS, 2),
+    EP(0x11, "Tiefe 3", 0, 127, 0)
+  ]}
+];
+
+const QUICK_SUB = {title:"Offset-Regler", hi:0x40, mid:0x70, params:[
+  EP(0x35, "Pan", 1, 127, 64, {fmt:centered}),
+  EP(0x47, "Cutoff", -64, 63, 0, SIGN64),
+  EP(0x48, "Resonanz", -64, 63, 0, SIGN64),
+  EP(0x49, "AEG Attack Zeit", -64, 63, 0, SIGN64),
+  EP(0x37, "AEG Decay Zeit", -64, 63, 0, SIGN64),
+  EP(0x38, "AEG Sustain Pegel", -64, 63, 0, SIGN64),
+  EP(0x4A, "AEG Release Zeit", -64, 63, 0, SIGN64),
+  EP(0x39, "FEG Attack Zeit", -64, 63, 0, SIGN64),
+  EP(0x3A, "FEG Decay Zeit", -64, 63, 0, SIGN64),
+  EP(0x3B, "FEG Release Zeit", -64, 63, 0, SIGN64),
+  EP(0x3D, "FEG Tiefe", -64, 63, 0, SIGN64),
+  EP(0x41, "EQ tief", -64, 63, 0, SIGN64),
+  EP(0x42, "EQ Mitte tief", -64, 63, 0, SIGN64),
+  EP(0x43, "EQ Mitte hoch", -64, 63, 0, SIGN64),
+  EP(0x44, "EQ hoch", -64, 63, 0, SIGN64),
+  EP(0x3E, "Assign A", -64, 63, 0, SIGN64),
+  EP(0x3F, "Assign B", -64, 63, 0, SIGN64),
+  EP(0x45, "Assign 1", -64, 63, 0, SIGN64),
+  EP(0x46, "Assign 2", -64, 63, 0, SIGN64)
+]};
+
+const EDIT_TREE = [{title:"Quick Edit \u00b7 wirkt sofort", subs:[QUICK_SUB]},
+                   {title:"Voice Common", subs:COMMON_SUBS}].concat(
+  [0, 1, 2, 3].map(ee => ({title:"Element " + (ee + 1), mid:ee, subs:ELEM_SUBS})));
+
+function editKey(hi, mid, lo){ return hex2(hi) + "-" + hex2(mid) + "-" + hex2(lo); }
+function editClamp(p, v){
+  const n = Math.round(Number(v));
+  return Math.max(p.min, Math.min(p.max, isFinite(n) ? n : p.def));
+}
+function editValue(hi, mid, p){
+  const stored = EDIT_STATE[editKey(hi, mid, p.lo)];
+  return stored === undefined ? p.def : editClamp(p, stored);
+}
+function editText(p, v){ return p.opts ? (p.opts[v] || String(v)) : (p.fmt ? p.fmt(v) : String(v)); }
+function editWarn(){
+  if(RACK_MODE !== "voice") return "nur im VOICE-Modus wirksam \u00b7 ";
+  if(fxBaseAddress() !== 0x40) return "Drum Voice geladen, Adressen gelten f\u00fcr Normal Voices \u00b7 ";
+  return "";
+}
+function editSend(hi, mid, p, value, quiet, when){
+  const v = editClamp(p, value);
+  EDIT_STATE[editKey(hi, mid, p.lo)] = v;
+  const num = v + (p.off || 0);
+  const data = p.size === 2 ? split14(num) : [num & 127];
+  raw([0xF0, 0x43, 0x10 | DEVICE_NIBBLE, 0x7F, 0x00, hi & 127, mid & 127, p.lo & 127]
+      .concat(data.map(x => x & 127)).concat([0xF7]), when, true);
+  if(!quiet) line(editWarn() + editKey(hi, mid, p.lo).replace(/-/g, " ") + " \u00b7 " + p.name
+    + " \u2192 " + editText(p, v));
+}
+function editRow(hi, mid, p){
+  const row = document.createElement("div");
+  row.className = "editrow";
+  const label = document.createElement("span");
+  label.className = "lab"; label.textContent = p.name;
+  const out = document.createElement("output");
+  row.appendChild(label); row.appendChild(out);
+  const value = editValue(hi, mid, p);
+  let control, last = 0;
+  if(p.opts){
+    control = document.createElement("select");
+    p.opts.forEach((text, i) => control.add(new Option(text, String(i))));
+    control.value = String(value);
+    control.onchange = () => {
+      const v = Number(control.value);
+      out.textContent = editText(p, v);
+      editSend(hi, mid, p, v);
+    };
+  }else{
+    control = document.createElement("input");
+    control.type = "range"; control.min = String(p.min); control.max = String(p.max);
+    control.value = String(value); control.style.setProperty("--c", "var(--elem)");
+    control.oninput = () => {
+      const v = Number(control.value);
+      out.textContent = editText(p, v);
+      const now = performance.now();
+      if(now - last > 45){ last = now; editSend(hi, mid, p, v, true); }
+    };
+    control.onchange = () => editSend(hi, mid, p, Number(control.value));
+  }
+  out.textContent = editText(p, value);
+  control.setAttribute("aria-label", p.name);
+  row.appendChild(control);
+  EDIT_CONTROLS.push({refresh(){
+    const v = editValue(hi, mid, p);
+    control.value = String(v);
+    out.textContent = editText(p, v);
+  }});
+  return row;
+}
+function sendEditSub(hi, mid, sub){
+  const start = performance.now() + 10;
+  sub.params.forEach((p, i) => editSend(hi, mid, p, editValue(hi, mid, p), true, start + i * 8));
+  line(editWarn() + sub.title + ": " + sub.params.length + " Parameter gesendet");
+}
+function buildEditSub(host, hi, mid, sub){
+  const box = document.createElement("details");
+  box.className = "editsub";
+  box.innerHTML = "<summary>" + sub.title + " \u00b7 "
+    + editKey(hi, mid, sub.params[0].lo).replace(/-/g, " ") + "\u2026</summary>";
+  const rows = document.createElement("div");
+  rows.className = "editrows";
+  sub.params.forEach(p => rows.appendChild(editRow(hi, mid, p)));
+  box.appendChild(rows);
+  const button = document.createElement("button");
+  button.type = "button"; button.className = "editsend";
+  button.textContent = "Diese Gruppe senden";
+  button.onclick = () => sendEditSub(hi, mid, sub);
+  box.appendChild(button);
+  host.appendChild(box);
+}
+function subMid(group, sub){ return sub.mid == null ? group.mid : sub.mid; }
+function sendEditChanged(){
+  const start = performance.now() + 10;
+  let n = 0;
+  EDIT_TREE.forEach(group => group.subs.forEach(sub => {
+    const hi = sub.hi, mid = subMid(group, sub);
+    sub.params.forEach(p => {
+      if(EDIT_STATE[editKey(hi, mid, p.lo)] === undefined) return;
+      editSend(hi, mid, p, editValue(hi, mid, p), true, start + n * 8);
+      n++;
+    });
+  }));
+  line(n ? editWarn() + n + " ge\u00e4nderte Voice-Edit-Werte gesendet"
+        : "keine ge\u00e4nderten Voice-Edit-Werte vorhanden");
+}
+function refreshEditControls(){ EDIT_CONTROLS.forEach(control => control.refresh()); }
+(function buildEditTree(){
+  const host = $("#editgroups");
+  EDIT_TREE.forEach(group => {
+    const box = document.createElement("details");
+    box.className = "editgrp";
+    box.innerHTML = "<summary>" + group.title + "</summary>";
+    const inner = document.createElement("div");
+    box.appendChild(inner);
+    box.addEventListener("toggle", () => {
+      if(!box.open || inner.dataset.built) return;
+      inner.dataset.built = "1";
+      group.subs.forEach(sub => buildEditSub(inner, sub.hi, subMid(group, sub), sub));
+    });
+    host.appendChild(box);
+  });
+  $("#editsendall").onclick = sendEditChanged;
+})();
+
+
 const env = $("#env"), envfill = $("#envfill");
 function drawEnv(){
   if(!KN.attack) return;
@@ -995,7 +1327,9 @@ function padMove(e){
 }
 pad.addEventListener("pointerdown", e => { pad.setPointerCapture(e.pointerId); padMove(e); });
 pad.addEventListener("pointermove", e => { if(pad.hasPointerCapture(e.pointerId)) padMove(e); });
-pad.addEventListener("pointerup", e => { const [c, r] = padMove(e); send("cc", 74, c); setTimeout(() => send("cc", 71, r), 15); });
+pad.addEventListener("pointerup", e => { const [c, r] = padMove(e);
+  send("cc", 74, c); offsetSend(0x47, c, "Cutoff");
+  setTimeout(() => { send("cc", 71, r); offsetSend(0x48, r, "Resonanz"); }, 15); });
 
 let aiTimer;
 function remote(msg){
@@ -1950,7 +2284,7 @@ function setupData(){
   const freeParts=cloneMultiParts(SONG_GM?(MANUAL_PART_STATES||captureMultiParts()):captureMultiParts());
   if(!SONG_GM)MANUAL_PART_STATES=cloneMultiParts(freeParts);
   return {
-    format:"beyhl-synth-setup", version:17,
+    format:"beyhl-synth-setup", version:20,
     savedAt:new Date().toISOString(), rackMode:RACK_MODE, voiceMuted:VOICE_MUTED,voiceSource:VOICE_SOURCE,
     selectedPart:CH,selectedTarget:SELECTED_PLG?"plg1":"internal",
     keyboard:{base,velocity:Number($("#vel").value),visible:$("#kbtoggle").getAttribute("aria-pressed")==="true"},
@@ -1969,6 +2303,7 @@ function setupData(){
     elements:ELEMENT_CONTROLS.map(control=>({level:Number(control.lvl.value),tune:Number(control.tune.value),on:control.d.dataset.on==="true"})),
     effects:{reverbType:Number($("#revtype").value),chorusType:Number($("#chotype").value),
       values:Object.fromEntries(Object.entries(SYSFX_CONTROLS).map(([key,control])=>[key,Number(control.get())]))},
+    voiceEdit:Object.assign({},EDIT_STATE),
     ccMapping:CCREG.map(entry=>Number(entry.get()))
   };
 }
@@ -2067,6 +2402,12 @@ function loadSetup(data,fileName){
     control.d.dataset.on=String(saved.on!==false); control.sw.setAttribute("aria-checked",String(saved.on!==false));
     control.show(control.lvl); control.show(control.tune);
   });
+  Object.keys(EDIT_STATE).forEach(key=>delete EDIT_STATE[key]);
+  Object.entries(data.voiceEdit||{}).forEach(([key,value])=>{
+    if(/^[0-9A-F]{2}-[0-9A-F]{2}-[0-9A-F]{2}$/.test(key)&&isFinite(Number(value)))
+      EDIT_STATE[key]=Math.round(Number(value));
+  });
+  refreshEditControls();
   VOICE_MUTED=Boolean(data.voiceMuted);
   VOICE_SOURCE=data.voiceSource==="plg1"?"plg1":"internal";
   SELECTED_PLG=data.selectedTarget==="plg1";
@@ -2096,7 +2437,7 @@ $("#setupload").onclick=async()=>{
 };
 paintPos();
 
-line("bereit · V19 · Instrumente: Eigene oder GM · MIDI-Kanäle: grau frei, grün benutzt, rot Note");
+line("bereit · V22 · Instrumente: Eigene oder GM · MIDI-Kanäle: grau frei, grün benutzt, rot Note");
 </script>
 </body>
 </html>

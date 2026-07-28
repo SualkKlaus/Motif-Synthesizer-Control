@@ -2,13 +2,21 @@
 
 Free control software for the Yamaha Motif Rack ES, running directly in the browser via the Web MIDI interface.
 
-## Version 19 — GM Song Mode, Free Multi Voices and Channel Activity
+## Version 22 — Working Mix, Effects, Filter and Amplitude EG Controls
 
 ## Start
 
-Open the current version [`beyhl_synth_V19.html`](beyhl_synth_V19.html) in Chrome and allow MIDI access, then connect the Motif Rack ES via USB.
+Open the current version [`beyhl_synth_V22.html`](beyhl_synth_V22.html) in Chrome and allow MIDI access, then connect the Motif Rack ES via USB.
 
-Version 19 uses the Yamaha-documented Multi Part parameter-change addresses to control the 16 internal parts. In Multi mode, the right-side selector switches between **GM from song** and **Free selection on the left**. GM mode reads the initial banks and programs from the loaded MIDI file. Free mode keeps a separate editable setup for all 16 parts, with bank and categorized voice selection directly in the left mixer. Saved free setups can be loaded again later.
+Local source documents, the authoritative MIDI table and the implemented SysEx
+addresses are recorded in [`PROJEKT_NOTIZEN.md`](PROJEKT_NOTIZEN.md).
+
+Version 22 adds working controls for **Mix and Effects**, **Filter**, and
+**Amplitude EG**. Filter and EG now use the offset addresses accepted by the
+MOTIF-RACK ES in Voice mode. The Yamaha-documented Multi Part parameter-change
+addresses continue to control the 16 internal parts.
+
+In Multi mode, the right-side selector switches between **GM from song** and **Free selection on the left**. GM mode reads the initial banks and programs from the loaded MIDI file. Free mode keeps a separate editable setup for all 16 parts, with bank and categorized voice selection directly in the left mixer. Saved free setups can be loaded again later.
 
 Each MIDI channel has a small activity indicator: gray means unused, green means used by the loaded song, and a short red flash marks an incoming note during playback. The loaded song name remains visible in both Voice and Multi modes. Mixer volumes start at 90 percent for a consistent level.
 
