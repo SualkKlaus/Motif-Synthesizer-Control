@@ -35,6 +35,10 @@ addresses continue to control the 16 internal parts.
 
 [Watch the 41-second Synthesizer Demo (MP4)](Synthesizer_Demo.mp4)
 
+### AI-created Flamenco Demo
+
+[Watch the 92-second Flamenco demo created with AI (MP4)](Flamenco_KI_Demo.mp4)
+
 In Multi mode, the right-side selector switches between **GM from song** and **Free selection on the left**. GM mode reads the initial banks and programs from the loaded MIDI file. Free mode keeps a separate editable setup for all 16 parts, with bank and categorized voice selection directly in the left mixer. Saved free setups can be loaded again later.
 
 Each MIDI channel has a small activity indicator: gray means unused, green means used by the loaded song, and a short red flash marks an incoming note during playback. The loaded song name remains visible in both Voice and Multi modes. Mixer volumes start at 90 percent for a consistent level.
