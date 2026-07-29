@@ -6,7 +6,7 @@ die Weiterentwicklung des Bedienprogramms fest.
 ## Projektdateien
 
 - Projektordner: `/home/klaus/Dokumente/GitHub Projekte/Motif-Synthesizer-Control`
-- Aktuelle Programmversion: `beyhl_synth_V25.html`
+- Aktuelle Programmversion: `beyhl_synth_V30.html`
 - Zielgerät: Yamaha MOTIF-RACK ES
 
 ## Verbindliche MIDI-Quelle
@@ -50,8 +50,21 @@ Das im Programm verwendete SysEx-Schema lautet:
 F0 43 10 7F 00 37 pp xx value F7
 ```
 
-Die Umsetzung befindet sich in `beyhl_synth_V25.html` in der Funktion
+Die aktuelle Umsetzung befindet sich in `beyhl_synth_V30.html` in der Funktion
 `multiPartParam()`.
+
+## Stand V30
+
+V30 erweitert die Tonwalze um präzise Bearbeitung:
+
+- Der senkrechte Abspielkopf ist im Stop-Modus direkt mit der Maus verschiebbar.
+- Beim Verschieben des Abspielkopfs werden die dort aktiven MIDI-Noten kurz vorgespielt.
+- Ein horizontal markierter Zeitbereich kann mit `Entf` entfernt werden; der Rest wird lückenlos vorgezogen.
+- Über den Schnitt hinausreichende Noten sowie die am Schnitt gültigen Bank-, Programm- und Controllerzustände bleiben erhalten.
+- Einzelne Notenblöcke lassen sich vertikal exakt in Halbtonschritten verschieben und vorhören.
+- Bis zu zehn Bearbeitungsschritte lassen sich über **Rückgängig** oder `Strg+Z` zurücknehmen.
+- Stop und Play setzen die Position nicht mehr zurück; nur **Anfang** springt auf null.
+- Song und vollständiges aktuelles Setup werden gemeinsam unter einem frei gewählten Namen als eine `.sos`-Datei gespeichert und wieder geladen.
 
 ## Stand V25
 

@@ -2,21 +2,29 @@
 
 Free control software for the Yamaha Motif Rack ES, running directly in the browser via the Web MIDI interface.
 
-## Version 25 — Integrated Mini Sequencer
+## Version 30 — Editable MIDI Piano Roll and Complete Song Setups
 
 ## Start
 
-Open the current version [`beyhl_synth_V25.html`](beyhl_synth_V25.html) in Chrome and allow MIDI access, then connect the Motif Rack ES via USB.
+Open the current version [`beyhl_synth_V30.html`](beyhl_synth_V30.html) in Chrome and allow MIDI access, then connect the Motif Rack ES via USB.
 
 Local source documents, the authoritative MIDI table and the implemented SysEx
 addresses are recorded in [`PROJEKT_NOTIZEN.md`](PROJEKT_NOTIZEN.md).
 
-Version 25 includes an integrated **mini MIDI sequencer**. Notes played on the
-connected keyboard are recorded while the Motif remains audible, and a scrolling
-piano roll displays the performance in real time. The recorder provides controls
-for return to start, record, stop, playback, a new take, and saving the result as
-a standard MIDI file. The piano roll is intentionally read-only in this version
-to keep recording fast and straightforward.
+Version 30 extends the integrated **mini MIDI sequencer** with precise piano-roll
+editing. The vertical playhead can be dragged directly over the notes in Stop
+mode, with a short MIDI preview while scrubbing. Dragging across an empty area
+marks a colored time range; pressing `Delete` removes exactly that range and
+closes the gap while preserving notes and MIDI controller state at the cut.
+Individual note blocks can be dragged vertically in exact semitone steps, also
+with an audible preview. Up to ten edits can be undone with the visible
+**Undo** button or `Ctrl+Z`.
+
+Playback now continues from the selected position instead of jumping to the
+beginning; the separate **Start** button remains responsible for returning to
+zero. A song and its complete current Motif setup—including freely selected
+voices, mixer values, effects, and other settings—can be saved together under a
+freely chosen name as one `.sos` file and restored together later.
 
 The working controls for **Mix and Effects**, **Filter**, and **Amplitude EG**
 remain included. Filter and EG use the offset addresses accepted by the
